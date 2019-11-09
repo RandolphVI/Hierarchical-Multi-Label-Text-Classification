@@ -1,6 +1,6 @@
 # Hierarchical Multi-Label Text Classification
 
-This repository is my research project, and it is accepted by CIKM'19.
+This repository is my research project, and it is accepted by CIKM'19. The [paper](http://delivery.acm.org/10.1145/3360000/3357885/p1051-huang.pdf?ip=103.113.156.102&id=3357885&acc=OPEN&key=4D4702B0C3E38B35%2E4D4702B0C3E38B35%2E3D746FD93C6876E3%2E6D218144511F3437&__acm__=1573281290_ce457d91947517f3e020f13eecb00a75) is already published.
 
 The main objective of the project is to solve the hierarchical multi-label text classification (**HMTC**) problem. Different from the multi-label text classification, HMTC assigns each instance (object) into multiple categories and these categories are stored in a hierarchy structure, is a fundamental but challenging task of numerous applications.
 
