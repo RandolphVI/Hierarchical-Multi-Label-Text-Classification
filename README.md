@@ -56,21 +56,23 @@ You can pre-training your word vectors(based on your corpus) in many ways:
 
 **If you want to follow the paper or utilize the code, please note the following info in your work:** 
 
-> @inproceedings{huang2019hierarchical,
->
-> title={Hierarchical Multi-label Text Classification: An Attention-based Recurrent Network Approach},
->
-> author={Huang, Wei and Chen, Enhong and Liu, Qi and Chen, Yuying and Huang, Zai and Liu, Yang and Zhao, Zhou and Zhang, Dan and Wang, Shijin},
->
-> booktitle={Proceedings of the 28th ACM International Conference on Information and Knowledge Management},
->
-> pages={1051--1060},
->
-> year={2019},
->
-> organization={ACM}
-> }
-
+```bibtex
+@inproceedings{huang2019hierarchical,
+  author    = {Wei Huang and
+               Enhong Chen and
+               Qi Liu and
+               Yuying Chen and
+               Zai Huang and
+               Yang Liu and
+               Zhou	Zhao and
+               Dan Zhang and
+               Shijin Wang},
+  title     = {Hierarchical Multi-label Text Classification: An Attention-based Recurrent Network Approach},
+  booktitle = {Proceedings of the 28th {ACM} {CIKM} International Conference on Information and Knowledge Management, {CIKM} 2019, Beijing, CHINA, Nov 3-7, 2019},
+  pages     = {1051--1060},
+  year      = {2019},
+}
+```
 ---
 
 ## About Me
