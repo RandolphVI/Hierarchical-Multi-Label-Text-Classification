@@ -64,7 +64,7 @@ You can pre-training your word vectors(based on your corpus) in many ways:
                Yuying Chen and
                Zai Huang and
                Yang Liu and
-               Zhou	Zhao and
+               Zhou Zhao and
                Dan Zhang and
                Shijin Wang},
   title     = {Hierarchical Multi-label Text Classification: An Attention-based Recurrent Network Approach},
