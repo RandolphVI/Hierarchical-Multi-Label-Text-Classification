@@ -1,0 +1,5 @@
+word2vec_100.model filter=lfs diff=lfs merge=lfs -text
+word2vec_100.model.trainables.syn1neg.npy filter=lfs diff=lfs merge=lfs -text
+word2vec_100.model.wv.vectors.npy filter=lfs diff=lfs merge=lfs -text
+Train.json filter=lfs diff=lfs merge=lfs -text
+Test.json filter=lfs diff=lfs merge=lfs -text
