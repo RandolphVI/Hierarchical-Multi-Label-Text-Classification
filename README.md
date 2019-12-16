@@ -27,13 +27,17 @@ The Figure shows an example of predefined labels in hierarchical multi-label cla
 
 ## Data
 
-See data format in `data` folder which including the data sample files.
+You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p_vlYq31gE0Ly07Z2XTvD5QlM) used in the paper. And the [Word2vec model file (dim=100)](https://drive.google.com/open?id=1cu5sjts9x7eOcKw-ngXwFKpDMVItaivk) is also uploaded. **Make sure they are under the `/data` folder.**
+
+(As for **Education Dataset**, they may attract copyright protection under China law. Thus, there is no details of dataset.)
 
 ### Text Segment
 
 You can use `jieba` package if you are going to deal with the Chinese text data.
 
 ### Data Format
+
+See data format in `data` folder which including the data sample files.
 
 This repository can be used in other datasets (text classification) in two ways:
 1. Modify your datasets into the same format of the sample.
@@ -51,6 +55,13 @@ You can pre-training your word vectors(based on your corpus) in many ways:
 ## Network Structure
 
 ![](https://live.staticflickr.com/65535/48647692206_2e5e6e7f13_o.png)
+
+### HAM unit
+
+![](https://live.staticflickr.com/65535/49226682132_a596463e05_o.jpg)
+
+
+![](https://live.staticflickr.com/65535/49226682297_dc0a932002_o.jpg)
 
 ## Reference
 
