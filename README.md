@@ -57,13 +57,13 @@ Use the <u>figure in Introduction</u> as example, now I will explain how to cons
 
 **Step 1:** Figure has 3 categories, you should index this 3 categories first, like:
 
-```json
+```
 {"Chemistry": 1, "Physics": 2, "Electricity": 3}
 ```
 
 **Step 2**: You index the next level, like:
 
-```json
+```
 {"Inorganic Chemistry": 1, "Organic Chemistry": 2, "Nuclear Physics": 3, "Material analysis": 4, "XXX": 5, ..., "XXX": N}
 ```
 
@@ -71,7 +71,7 @@ Note: ***N*** is the total number of your subcategories.
 
 **Step 3**: You index the third level, like:
 
-```json
+```
 {"Steroids": 1, "Peptides": 2, "Heterocyclic Compounds": 3, ..., "XXX": M}
 ```
 
@@ -81,7 +81,7 @@ Note: ***M*** is the total number of your level-3 categories.
 
 **Step 5**: Now Suppose you have one record:
 
-```json
+```
 {"id": "1", "title": ["tokens"], "abstract": ["tokens"], "section": [1, 2], "subsection": [1, 2, 3, 4], "group": [1, 2, 3, 4], "labels": [1, 2, 1+N, 2+N, 3+N, 4+N, 1+N+M, 2+N+M, 3+N+M, 4+N+M]}
 ```
 
