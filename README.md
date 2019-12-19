@@ -37,7 +37,61 @@ You can use `jieba` package if you are going to deal with the Chinese text data.
 
 ### Data Format
 
-See data format in `data` folder which including the data sample files.
+See data format in `data` folder which including the data sample files. For example:
+
+```json
+{"id": "3930316", "title": ["sighting", "firearm"], "abstract": ["rear", "sight", "firearm", "ha", "peephole", "device", "formed", "hollow", "tube", "end", "closed", "peephole",], "section": [5], "subsection": [104], "group": [512], "subgroup": [6535], "labels": [5, 113, 649, 7333]}
+```
+
+- **"id"**: just the id.
+- **"title" & "abstract"**: it's the word segment (after cleaning stopwords).
+- **"section"**: it's the first level category index.
+- **"subsection"**: it's the second level category index.
+- **"group"**: it's the third level category index.
+- **"subgroup"**: it's the fourth level category index.
+- **"labels"**: it's the total category which add the index offset. (I will explain that later)
+
+### How to construct the data?
+
+Use the <u>figure in Introduction</u> as example, now I will explain how to construct the label index. 
+
+**Step 1:** Figure has 3 categories, you should index this 3 categories first, like:
+
+```json
+{"Chemistry": 1, "Physics": 2, "Electricity": 3}
+```
+
+**Step 2**: You index the next level, like:
+
+```json
+{"Inorganic Chemistry": 1, "Organic Chemistry": 2, "Nuclear Physics": 3, "Material analysis": 4, "XXX": 5, ....., "XXX": N}
+```
+
+Note: ***N*** is the total number of your subcategories.
+
+**Step 3**: You index the third level, like:
+
+```json
+{"Steroids": 1, "Peptides": 2, "Heterocyclic Compounds": 3, ...., "XXX": M}
+```
+
+Note: ***M*** is the total number of your level-3 categories.
+
+**Step 4**: If you have the fourth level or deeper level, index them.
+
+**Step 5**: Now Suppose you have one record:
+
+```json
+{"id": "1", "title": ["tokens"], "abstract": ["tokens"], "section": [1, 2], "subsection": [1, 2, 3, 4], "group": [1, 2, 3, 4], "labels": [1, 2, 1+N, 2+N, 3+N, 4+N, 1+N+M, 2+N+M, 3+N+M, 4+N+M]}
+```
+
+**Assume that your total category number of level-2 is 100 (*N*=100), of level-3 is 500 (*M*=500). *N* & *M* is the offset for the `labels` attribute.**
+
+the record should be construed as:
+
+```json
+{"id": "1", "hashtags": ["token"], "section": [1, 2], "subsection": [1, 2, 3, 4], "group": [1, 2, 3, 4], "labels": [1, 2, 101, 102, 103, 104, 601, 602, 603, 604]}
+```
 
 This repository can be used in other datasets (text classification) in two ways:
 1. Modify your datasets into the same format of the sample.
