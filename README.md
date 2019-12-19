@@ -64,7 +64,7 @@ Use the <u>figure in Introduction</u> as example, now I will explain how to cons
 **Step 2**: You index the next level, like:
 
 ```json
-{"Inorganic Chemistry": 1, "Organic Chemistry": 2, "Nuclear Physics": 3, "Material analysis": 4, "XXX": 5, ....., "XXX": N}
+{"Inorganic Chemistry": 1, "Organic Chemistry": 2, "Nuclear Physics": 3, "Material analysis": 4, "XXX": 5, ..., "XXX": N}
 ```
 
 Note: ***N*** is the total number of your subcategories.
@@ -72,7 +72,7 @@ Note: ***N*** is the total number of your subcategories.
 **Step 3**: You index the third level, like:
 
 ```json
-{"Steroids": 1, "Peptides": 2, "Heterocyclic Compounds": 3, ...., "XXX": M}
+{"Steroids": 1, "Peptides": 2, "Heterocyclic Compounds": 3, ..., "XXX": M}
 ```
 
 Note: ***M*** is the total number of your level-3 categories.
