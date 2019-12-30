@@ -168,26 +168,6 @@ def test_harnn():
                 batch_first_attention, batch_first_visual, batch_second_visual, batch_third_visual, batch_scores, cur_loss = \
                     sess.run([first_attention, first_visual, second_visual, third_visual, scores, loss], feed_dict)
 
-                print(batch_first_visual)
-                print(batch_first_visual[0])
-                print(batch_first_visual[1])
-                print(batch_first_visual[0, :15])
-
-                f = open('attention.html', 'w')
-                f.write('<html style="margin:0;padding:0;"><body style="margin:0;padding:0;">\n')
-
-                f.write('<div style="margin:25px;">\n')
-                for k in range(len(batch_first_attention[0])):
-                    f.write('<p style="margin:10px;">\n')
-                    for i in range(len(batch_first_attention[0][0])):
-                        alpha = "{:.2f}".format(batch_first_attention[0][k][i])
-                        word = x_batch_test[i]
-                        f.write(f'\t<span style="margin-left:3px;background-color:rgba(255,0,0,{alpha})">{word}</span>\n')
-                    f.write('</p>\n')
-                f.write('</div>\n')
-                f.write('</body></html>')
-                f.close()
-
                 # Prepare for calculating metrics
                 for onehot_labels in y_batch_test:
                     true_onehot_labels.append(onehot_labels)
