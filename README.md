@@ -1,5 +1,7 @@
 # Hierarchical Multi-Label Text Classification
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/3b66b223350047df99d3d56808ad73a8)](https://app.codacy.com/manual/chinawolfman/Hierarchical-Multi-Label-Text-Classification?utm_source=github.com&utm_medium=referral&utm_content=RandolphVI/Hierarchical-Multi-Label-Text-Classification&utm_campaign=Badge_Grade_Dashboard)
+
 This repository is my research project, and it is accepted by CIKM'19. The [paper](https://dl.acm.org/citation.cfm?id=3357384.3357885) is already published.
 
 The main objective of the project is to solve the hierarchical multi-label text classification (**HMTC**) problem. Different from the multi-label text classification, HMTC assigns each instance (object) into multiple categories and these categories are stored in a hierarchy structure, is a fundamental but challenging task of numerous applications.
