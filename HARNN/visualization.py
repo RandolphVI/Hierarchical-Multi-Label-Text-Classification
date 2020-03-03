@@ -1,10 +1,8 @@
 # -*- coding:utf-8 -*-
 __author__ = 'Randolph'
 
-import os
 import sys
 import time
-import numpy as np
 import tensorflow as tf
 
 from utils import checkmate as cm
