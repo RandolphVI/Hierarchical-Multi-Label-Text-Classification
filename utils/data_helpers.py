@@ -228,7 +228,7 @@ def get_label_threshold(scores, threshold=0.5):
 
 def get_label_topk(scores, top_num=1):
     """
-    Create the metadata file based on the corpus file (Used for the Embedding Visualization later).
+    Get the predicted labels based on the topK number.
 
     Args:
         scores: The all classes predicted scores provided by network
@@ -294,11 +294,11 @@ def load_word2vec_matrix(embedding_size, word2vec_file):
     model = gensim.models.Word2Vec.load(word2vec_file)
     vocab_size = len(model.wv.vocab.items())
     vocab = dict([(k, v.index) for k, v in model.wv.vocab.items()])
-    vector = np.zeros([vocab_size, embedding_size])
+    embedding_matrix = np.zeros([vocab_size, embedding_size])
     for key, value in vocab.items():
         if key is not None:
-            vector[value] = model[key]
-    return vocab_size, vector
+            embedding_matrix[value] = model[key]
+    return vocab_size, embedding_matrix
 
 
 def data_word2vec(input_file, num_classes_list, total_classes, word2vec_model):

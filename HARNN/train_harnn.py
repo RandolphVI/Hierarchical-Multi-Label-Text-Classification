@@ -283,7 +283,7 @@ def train_harnn():
                     current_epoch = current_step // num_batches_per_epoch
                     logger.info("Epoch {0} has finished!".format(current_epoch))
 
-    logger.info("✔︎ Done.")
+    logger.info("All Done.")
 
 
 if __name__ == '__main__':

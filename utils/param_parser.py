@@ -32,7 +32,7 @@ def parameter_parser():
     parser.add_argument("--word2vec-file",
                         nargs="?",
                         default="../data/word2vec_100.model",
-                        help="Word2vec file for embedding characters (the dim need to be the same as embedding dim).")
+                        help="Word2vec file for embedding characters. (the dim need to be the same as embedding dim).")
 
     # Model Hyperparameters
     parser.add_argument("--pad-seq-len",
@@ -68,7 +68,7 @@ def parameter_parser():
     parser.add_argument("--attention-penalization",
                         type=bool,
                         default=True,
-                        help="Use attention penalization or not(default: True)")
+                        help="Use attention penalization or not. (default: True)")
 
     parser.add_argument("--fc-dim",
                         type=int,
@@ -78,27 +78,27 @@ def parameter_parser():
     parser.add_argument("--dropout-rate",
                         type=float,
                         default=0.5,
-                        help="Dropout keep probability (default: 0.5)")
+                        help="Dropout keep probability. (default: 0.5)")
 
     parser.add_argument("--alpha",
                         type=float,
                         default=0.0,
-                        help="Weight of hierarchical violation in loss cal (default: 0.0)")
+                        help="Weight of hierarchical violation in loss cal. (default: 0.0)")
 
     parser.add_argument("--beta",
                         type=float,
                         default=0.5,
-                        help="Weight of global scores in scores cal (default: 0.5)")
+                        help="Weight of global scores in scores cal. (default: 0.5)")
 
     parser.add_argument("--num-classes-list",
                         type=list,
                         default=[9, 128, 661, 8364],
-                        help="Number of labels list (depends on the task)")
+                        help="Each number of labels in hierarchical structure. (depends on the task)")
 
     parser.add_argument("--total-classes",
                         type=int,
                         default=9162,
-                        help="Total number of labels list (depends on the task)")
+                        help="Total number of labels (depends on the task)")
 
     parser.add_argument("--topK",
                         type=int,
@@ -114,17 +114,17 @@ def parameter_parser():
     parser.add_argument("--epochs",
                         type=int,
                         default=10,
-                        help="Number of training epochs. Default is 20.")
+                        help="Number of training epochs. (default: 20)")
 
     parser.add_argument("--batch-size",
                         type=int,
                         default=128,
-                        help="Batch Size. Default is 128.")
+                        help="Batch Size. (default: 128)")
 
     parser.add_argument("--learning-rate",
                         type=float,
                         default=0.001,
-                        help="Learning rate. Default is 0.001.")
+                        help="Learning rate. (default: 0.001)")
 
     parser.add_argument("--decay-rate",
                         type=float,
