@@ -119,8 +119,8 @@ def visualize():
                     beta: args.beta,
                     is_training: False
                 }
-                batch_first_visual, batch_second_visual, batch_third_visual, batch_fourth_visual, batch_scores = \
-                    sess.run([first_visual, second_visual, third_visual, fourth_visual, scores], feed_dict)
+                batch_first_visual, batch_second_visual, batch_third_visual, batch_fourth_visual = \
+                    sess.run([first_visual, second_visual, third_visual, fourth_visual], feed_dict)
 
                 seq_len = len(x_batch_test_content[0])
                 pad_len = len(batch_first_visual[0])

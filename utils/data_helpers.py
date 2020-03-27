@@ -2,13 +2,11 @@
 __author__ = 'Randolph'
 
 import os
+import time
 import heapq
-import multiprocessing
 import gensim
 import logging
 import json
-import numpy as np
-import matplotlib.pyplot as plt
 
 from collections import OrderedDict
 from pylab import *
