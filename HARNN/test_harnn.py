@@ -4,101 +4,58 @@ __author__ = 'Randolph'
 import os
 import sys
 import time
+import logging
 import numpy as np
-import tensorflow as tf
 
+sys.path.append('../')
+logging.getLogger('tensorflow').disabled = True
+
+import tensorflow as tf
 from utils import checkmate as cm
 from utils import data_helpers as dh
+from utils import param_parser as parser
 from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score, average_precision_score
 
-# Parameters
-# ==================================================
+args = parser.parameter_parser()
+MODEL = dh.get_model_name()
+logger = dh.logger_fn("tflog", "logs/Test-{0}.log".format(time.asctime()))
 
-logger = dh.logger_fn("tflog", "logs/test-{0}.log".format(time.asctime()))
-
-MODEL = input("☛ Please input the model file you want to test, it should be like(1490175368): ")
-
-while not (MODEL.isdigit() and len(MODEL) == 10):
-    MODEL = input("✘ The format of your input is illegal, it should be like(1490175368), please re-input: ")
-logger.info("✔︎ The format of your input is legal, now loading to next step...")
-
-TRAININGSET_DIR = '../data/Train.json'
-VALIDATIONSET_DIR = '../data/Validation.json'
-TESTSET_DIR = '../data/Test.json'
-MODEL_DIR = 'runs/' + MODEL + '/checkpoints/'
-BEST_MODEL_DIR = 'runs/' + MODEL + '/bestcheckpoints/'
-SAVE_DIR = 'results/' + MODEL
-
-# Data Parameters
-tf.flags.DEFINE_string("training_data_file", TRAININGSET_DIR, "Data source for the training data.")
-tf.flags.DEFINE_string("validation_data_file", VALIDATIONSET_DIR, "Data source for the validation data")
-tf.flags.DEFINE_string("test_data_file", TESTSET_DIR, "Data source for the test data")
-tf.flags.DEFINE_string("checkpoint_dir", MODEL_DIR, "Checkpoint directory from training run")
-tf.flags.DEFINE_string("best_checkpoint_dir", BEST_MODEL_DIR, "Best checkpoint directory from training run")
-
-# Model Hyperparameters
-tf.flags.DEFINE_integer("pad_seq_len", 150, "Recommended padding Sequence length of data (depends on the data)")
-tf.flags.DEFINE_integer("embedding_dim", 100, "Dimensionality of character embedding (default: 128)")
-tf.flags.DEFINE_integer("embedding_type", 1, "The embedding type (default: 1)")
-tf.flags.DEFINE_integer("fc_hidden_size", 1024, "Hidden size for fully connected layer (default: 1024)")
-tf.flags.DEFINE_float("dropout_keep_prob", 0.5, "Dropout keep probability (default: 0.5)")
-tf.flags.DEFINE_float("l2_reg_lambda", 0.0, "L2 regularization lambda (default: 0.0)")
-tf.flags.DEFINE_float("beta", 0.0, "Weight of global losses in loss cal")
-tf.flags.DEFINE_float("alpha", 0.75, "Weight of hierarchical violation in loss cal")
-tf.flags.DEFINE_string("num_classes_list", "9,128,661,8364", "Number of labels list (depends on the task)")
-tf.flags.DEFINE_integer("total_classes", 9162, "Total number of labels list (depends on the task)")
-tf.flags.DEFINE_integer("top_num", 5, "Number of top K prediction classes (default: 5)")
-tf.flags.DEFINE_float("threshold", 0.5, "Threshold for prediction classes (default: 0.5)")
-
-# Test Parameters
-tf.flags.DEFINE_integer("batch_size", 25, "Batch Size (default: 1)")
-
-# Misc Parameters
-tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
-tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
-tf.flags.DEFINE_boolean("gpu_options_allow_growth", True, "Allow gpu options growth")
-
-FLAGS = tf.flags.FLAGS
-FLAGS(sys.argv)
-dilim = '-' * 100
-logger.info('\n'.join([dilim, *['{0:>50}|{1:<50}'.format(attr.upper(), FLAGS.__getattr__(attr))
-                                for attr in sorted(FLAGS.__dict__['__wrapped'])], dilim]))
+CPT_DIR = 'runs/' + MODEL + '/checkpoints/'
+BEST_CPT_DIR = 'runs/' + MODEL + '/bestcheckpoints/'
+SAVE_DIR = 'output/' + MODEL
 
 
 def test_harnn():
     """Test HARNN model."""
+    # Print parameters used for the model
+    dh.tab_printer(args, logger)
 
     # Load data
-    logger.info("✔︎ Loading data...")
-    logger.info("Recommended padding Sequence length is: {0}".format(FLAGS.pad_seq_len))
+    logger.info("Loading data...")
+    logger.info("Data processing...")
+    test_data = dh.load_data_and_labels(args.test_file, args.num_classes_list, args.total_classes,
+                                        args.word2vec_file, data_aug_flag=False)
 
-    logger.info("✔︎ Test data processing...")
-    test_data = dh.load_data_and_labels(FLAGS.test_data_file, FLAGS.num_classes_list, FLAGS.total_classes,
-                                        FLAGS.embedding_dim, data_aug_flag=False)
-
-    logger.info("✔︎ Test data padding...")
-    x_test, y_test, y_test_tuple = dh.pad_data(test_data, FLAGS.pad_seq_len)
+    logger.info("Data padding...")
+    x_test, y_test, y_test_tuple = dh.pad_data(test_data, args.pad_seq_len)
     y_test_labels = test_data.labels
 
     # Load harnn model
-    BEST_OR_LATEST = input("☛ Load Best or Latest Model?(B/L): ")
-
-    while not (BEST_OR_LATEST.isalpha() and BEST_OR_LATEST.upper() in ['B', 'L']):
-        BEST_OR_LATEST = input("✘ The format of your input is illegal, please re-input: ")
-    if BEST_OR_LATEST.upper() == 'B':
-        logger.info("✔︎ Loading best model...")
-        checkpoint_file = cm.get_best_checkpoint(FLAGS.best_checkpoint_dir, select_maximum_value=True)
+    OPTION = dh._option(pattern=1)
+    if OPTION == 'B':
+        logger.info("Loading best model...")
+        checkpoint_file = cm.get_best_checkpoint(BEST_CPT_DIR, select_maximum_value=True)
     else:
-        logger.info("✔︎ Loading latest model...")
-        checkpoint_file = tf.train.latest_checkpoint(FLAGS.checkpoint_dir)
+        logger.info("Loading latest model...")
+        checkpoint_file = tf.train.latest_checkpoint(CPT_DIR)
     logger.info(checkpoint_file)
 
     graph = tf.Graph()
     with graph.as_default():
         session_conf = tf.ConfigProto(
-            allow_soft_placement=FLAGS.allow_soft_placement,
-            log_device_placement=FLAGS.log_device_placement)
-        session_conf.gpu_options.allow_growth = FLAGS.gpu_options_allow_growth
+            allow_soft_placement=args.allow_soft_placement,
+            log_device_placement=args.log_device_placement)
+        session_conf.gpu_options.allow_growth = args.gpu_options_allow_growth
         sess = tf.Session(config=session_conf)
         with sess.as_default():
             # Load the saved meta graph and restore variables
@@ -134,11 +91,11 @@ def test_harnn():
 
             # Generate batches for one epoch
             batches = dh.batch_iter(list(zip(x_test, y_test, y_test_tuple, y_test_labels)),
-                                    FLAGS.batch_size, 1, shuffle=False)
+                                    args.batch_size, 1, shuffle=False)
 
             test_counter, test_loss = 0, 0.0
 
-            # Collection
+            # Collect the predictions here
             true_labels = []
             predicted_labels = []
             predicted_scores = []
@@ -147,7 +104,7 @@ def test_harnn():
             true_onehot_labels = []
             predicted_onehot_scores = []
             predicted_onehot_labels_ts = []
-            predicted_onehot_labels_tk = [[] for _ in range(FLAGS.top_num)]
+            predicted_onehot_labels_tk = [[] for _ in range(args.topK)]
 
             true_onehot_first_labels = []
             true_onehot_second_labels = []
@@ -178,7 +135,7 @@ def test_harnn():
                     input_y_fourth: y_batch_test_fourth,
                     input_y: y_batch_test,
                     dropout_keep_prob: 1.0,
-                    beta: FLAGS.beta,
+                    beta: args.beta,
                     is_training: False
                 }
                 batch_first_scores, batch_second_scores, batch_third_scores, batch_fourth_scores, batch_scores, cur_loss = \
@@ -209,7 +166,7 @@ def test_harnn():
 
                 # Get the predicted labels by threshold
                 batch_predicted_labels_ts, batch_predicted_scores_ts = \
-                    dh.get_label_threshold(scores=batch_scores, threshold=FLAGS.threshold)
+                    dh.get_label_threshold(scores=batch_scores, threshold=args.threshold)
 
                 # Add results to collection
                 for labels in y_batch_test_labels:
@@ -221,15 +178,15 @@ def test_harnn():
 
                 # Get one-hot prediction by threshold
                 batch_predicted_onehot_labels_ts = \
-                    dh.get_onehot_label_threshold(scores=batch_scores, threshold=FLAGS.threshold)
+                    dh.get_onehot_label_threshold(scores=batch_scores, threshold=args.threshold)
                 batch_predicted_onehot_labels_first = \
-                    dh.get_onehot_label_threshold(scores=batch_first_scores, threshold=FLAGS.threshold)
+                    dh.get_onehot_label_threshold(scores=batch_first_scores, threshold=args.threshold)
                 batch_predicted_onehot_labels_second = \
-                    dh.get_onehot_label_threshold(scores=batch_second_scores, threshold=FLAGS.threshold)
+                    dh.get_onehot_label_threshold(scores=batch_second_scores, threshold=args.threshold)
                 batch_predicted_onehot_labels_third = \
-                    dh.get_onehot_label_threshold(scores=batch_third_scores, threshold=FLAGS.threshold)
+                    dh.get_onehot_label_threshold(scores=batch_third_scores, threshold=args.threshold)
                 batch_predicted_onehot_labels_fourth = \
-                    dh.get_onehot_label_threshold(scores=batch_fourth_scores, threshold=FLAGS.threshold)
+                    dh.get_onehot_label_threshold(scores=batch_fourth_scores, threshold=args.threshold)
 
                 for onehot_labels in batch_predicted_onehot_labels_ts:
                     predicted_onehot_labels_ts.append(onehot_labels)
@@ -243,7 +200,7 @@ def test_harnn():
                     predicted_onehot_labels_fourth.append(onehot_labels)
 
                 # Get one-hot prediction by topK
-                for i in range(FLAGS.top_num):
+                for i in range(args.topK):
                     batch_predicted_onehot_labels_tk = dh.get_onehot_label_topk(scores=batch_scores, top_num=i + 1)
 
                     for onehot_labels in batch_predicted_onehot_labels_tk:
@@ -307,19 +264,19 @@ def test_harnn():
 
             test_loss = float(test_loss / test_counter)
 
-            logger.info("☛ All Test Dataset: Loss {0:g} | AUC {1:g} | AUPRC {2:g}"
+            logger.info("All Test Dataset: Loss {0:g} | AUC {1:g} | AUPRC {2:g}"
                         .format(test_loss, test_auc, test_prc))
             # Predict by threshold
-            logger.info("☛ Predict by threshold: Precision {0:g}, Recall {1:g}, F1 {2:g}"
+            logger.info("Predict by threshold: Precision {0:g}, Recall {1:g}, F1 {2:g}"
                         .format(test_pre_ts, test_rec_ts, test_F_ts))
 
-            logger.info("☛ Predict by threshold in Level-1: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
+            logger.info("Predict by threshold in Level-1: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
                         .format(test_pre_first, test_rec_first, test_F_first, test_prc_first))
-            logger.info("☛ Predict by threshold in Level-2: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
+            logger.info("Predict by threshold in Level-2: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
                         .format(test_pre_second, test_rec_second, test_F_second, test_prc_second))
-            logger.info("☛ Predict by threshold in Level-3: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
+            logger.info("Predict by threshold in Level-3: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
                         .format(test_pre_third, test_rec_third, test_F_third, test_prc_third))
-            logger.info("☛ Predict by threshold in Level-4: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
+            logger.info("Predict by threshold in Level-4: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
                         .format(test_pre_fourth, test_rec_fourth, test_F_fourth, test_prc_fourth))
 
             # Save the prediction result
@@ -329,7 +286,7 @@ def test_harnn():
                                       all_labels=true_labels, all_predict_labels=predicted_labels,
                                       all_predict_scores=predicted_scores)
 
-    logger.info("✔︎ Done.")
+    logger.info("All Done.")
 
 
 if __name__ == '__main__':

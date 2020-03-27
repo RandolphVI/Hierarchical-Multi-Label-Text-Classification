@@ -8,8 +8,8 @@ class TextHARNN(object):
     """A HARNN for text classification."""
 
     def __init__(
-            self, sequence_length, num_classes_list, total_classes, vocab_size, batch_size, lstm_hidden_size,
-            attention_unit_size, fc_hidden_size, embedding_size, embedding_type, l2_reg_lambda=0.0, alpha=0.0,
+            self, sequence_length, vocab_size, embedding_type, embedding_size, lstm_hidden_size, attention_unit_size,
+            fc_hidden_size, num_classes_list, total_classes, batch_size, l2_reg_lambda=0.0, alpha=0.0,
             pretrained_embedding=None):
 
         # Placeholders for input, output, dropout_prob and training_tag
