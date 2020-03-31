@@ -234,17 +234,17 @@ def test_harnn():
             test_rec_fourth = recall_score(y_true=np.array(true_onehot_fourth_labels),
                                            y_pred=np.array(predicted_onehot_labels_fourth), average='micro')
 
-            test_F_ts = f1_score(y_true=np.array(true_onehot_labels),
-                                 y_pred=np.array(predicted_onehot_labels_ts), average='micro')
+            test_F1_ts = f1_score(y_true=np.array(true_onehot_labels),
+                                  y_pred=np.array(predicted_onehot_labels_ts), average='micro')
 
-            test_F_first = f1_score(y_true=np.array(true_onehot_first_labels),
-                                    y_pred=np.array(predicted_onehot_labels_first), average='micro')
-            test_F_second = f1_score(y_true=np.array(true_onehot_second_labels),
-                                     y_pred=np.array(predicted_onehot_labels_second), average='micro')
-            test_F_third = f1_score(y_true=np.array(true_onehot_third_labels),
-                                    y_pred=np.array(predicted_onehot_labels_third), average='micro')
-            test_F_fourth = f1_score(y_true=np.array(true_onehot_fourth_labels),
-                                     y_pred=np.array(predicted_onehot_labels_fourth), average='micro')
+            test_F1_first = f1_score(y_true=np.array(true_onehot_first_labels),
+                                     y_pred=np.array(predicted_onehot_labels_first), average='micro')
+            test_F1_second = f1_score(y_true=np.array(true_onehot_second_labels),
+                                      y_pred=np.array(predicted_onehot_labels_second), average='micro')
+            test_F1_third = f1_score(y_true=np.array(true_onehot_third_labels),
+                                     y_pred=np.array(predicted_onehot_labels_third), average='micro')
+            test_F1_fourth = f1_score(y_true=np.array(true_onehot_fourth_labels),
+                                      y_pred=np.array(predicted_onehot_labels_fourth), average='micro')
 
             # Calculate the average AUC
             test_auc = roc_auc_score(y_true=np.array(true_onehot_labels),
@@ -268,16 +268,16 @@ def test_harnn():
                         .format(test_loss, test_auc, test_prc))
             # Predict by threshold
             logger.info("Predict by threshold: Precision {0:g}, Recall {1:g}, F1 {2:g}"
-                        .format(test_pre_ts, test_rec_ts, test_F_ts))
+                        .format(test_pre_ts, test_rec_ts, test_F1_ts))
 
             logger.info("Predict by threshold in Level-1: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
-                        .format(test_pre_first, test_rec_first, test_F_first, test_prc_first))
+                        .format(test_pre_first, test_rec_first, test_F1_first, test_prc_first))
             logger.info("Predict by threshold in Level-2: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
-                        .format(test_pre_second, test_rec_second, test_F_second, test_prc_second))
+                        .format(test_pre_second, test_rec_second, test_F1_second, test_prc_second))
             logger.info("Predict by threshold in Level-3: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
-                        .format(test_pre_third, test_rec_third, test_F_third, test_prc_third))
+                        .format(test_pre_third, test_rec_third, test_F1_third, test_prc_third))
             logger.info("Predict by threshold in Level-4: Precision {0:g}, Recall {1:g}, F1 {2:g}, AUPRC {3:g}"
-                        .format(test_pre_fourth, test_rec_fourth, test_F_fourth, test_prc_fourth))
+                        .format(test_pre_fourth, test_rec_fourth, test_F1_fourth, test_prc_fourth))
 
             # Save the prediction result
             if not os.path.exists(SAVE_DIR):
