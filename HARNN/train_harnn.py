@@ -259,7 +259,7 @@ def train_harnn():
                 if current_step % args.evaluate_steps == 0:
                     logger.info("\nEvaluation:")
                     eval_loss, eval_auc, eval_prc, \
-                    eval_rec_ts, eval_pre_ts, eval_F_ts, eval_rec_tk, eval_pre_tk, eval_F_tk = \
+                    eval_rec_ts, eval_pre_ts, eval_F1_ts, eval_rec_tk, eval_pre_tk, eval_F1_tk = \
                         validation_step(x_val, y_val, y_val_tuple, writer=validation_summary_writer)
 
                     logger.info("All Validation set: Loss {0:g} | AUC {1:g} | AUPRC {2:g}"
@@ -267,13 +267,13 @@ def train_harnn():
 
                     # Predict by threshold
                     logger.info("Predict by threshold: Precision {0:g}, Recall {1:g}, F1 {2:g}"
-                                .format(eval_pre_ts, eval_rec_ts, eval_F_ts))
+                                .format(eval_pre_ts, eval_rec_ts, eval_F1_ts))
 
                     # Predict by topK
                     logger.info("Predict by topK:")
                     for top_num in range(args.topK):
                         logger.info("Top{0}: Precision {1:g}, Recall {2:g}, F1 {3:g}"
-                                    .format(top_num+1, eval_pre_tk[top_num], eval_rec_tk[top_num], eval_F_tk[top_num]))
+                                    .format(top_num+1, eval_pre_tk[top_num], eval_rec_tk[top_num], eval_F1_tk[top_num]))
                     best_saver.handle(eval_prc, sess, current_step)
                 if current_step % args.checkpoint_steps == 0:
                     checkpoint_prefix = os.path.join(checkpoint_dir, "model")
