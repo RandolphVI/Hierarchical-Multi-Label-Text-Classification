@@ -32,13 +32,13 @@ def parameter_parser():
     parser.add_argument("--word2vec-file",
                         nargs="?",
                         default="../data/word2vec_100.model",
-                        help="Word2vec file for embedding characters. (the dim need to be the same as embedding dim).")
+                        help="Word2vec file for embedding characters (the dim need to be the same as embedding dim).")
 
     # Model Hyperparameters
     parser.add_argument("--pad-seq-len",
                         type=int,
                         default=150,
-                        help="Padding Sequence length of data. (depends on the data)")
+                        help="Padding sequence length of data. (depends on the data)")
 
     parser.add_argument("--embedding-type",
                         type=int,
@@ -48,22 +48,22 @@ def parameter_parser():
     parser.add_argument("--embedding-dim",
                         type=int,
                         default=100,
-                        help="Dimensionality of character embedding. (default: 300)")
+                        help="Dimensionality of character embedding. (default: 100)")
 
     parser.add_argument("--lstm-dim",
                         type=int,
                         default=256,
-                        help="Dimensionality for LSTM Neurons. (default: 256)")
+                        help="Dimensionality of LSTM neurons. (default: 256)")
 
     parser.add_argument("--lstm-layers",
                         type=int,
                         default=1,
-                        help="Number of LSTM Layers. (default: 1)")
+                        help="Number of LSTM layers. (default: 1)")
 
     parser.add_argument("--attention-dim",
                         type=int,
                         default=200,
-                        help="Dimensionality of Attention Neurons. (default: 200)")
+                        help="Dimensionality of Attention neurons. (default: 200)")
 
     parser.add_argument("--attention-penalization",
                         type=bool,
@@ -73,7 +73,7 @@ def parameter_parser():
     parser.add_argument("--fc-dim",
                         type=int,
                         default=512,
-                        help="Dimensionality for FC Neurons. (default: 512)")
+                        help="Dimensionality for FC neurons. (default: 512)")
 
     parser.add_argument("--dropout-rate",
                         type=float,
@@ -98,17 +98,17 @@ def parameter_parser():
     parser.add_argument("--total-classes",
                         type=int,
                         default=9162,
-                        help="Total number of labels (depends on the task)")
+                        help="Total number of labels. (depends on the task)")
 
     parser.add_argument("--topK",
                         type=int,
                         default=5,
-                        help="Number of top K prediction classes (default: 5)")
+                        help="Number of top K prediction classes. (default: 5)")
 
     parser.add_argument("--threshold",
                         type=float,
                         default=0.5,
-                        help="Threshold for prediction classes (default: 0.5)")
+                        help="Threshold for prediction classes. (default: 0.5)")
 
     # Training Parameters
     parser.add_argument("--epochs",
