@@ -88,7 +88,7 @@ def parameter_parser():
     parser.add_argument("--beta",
                         type=float,
                         default=0.5,
-                        help="Weight of global scores in scores cal. (default: 0.5)")
+                        help="Weight of global part in scores cal. (default: 0.5)")
 
     parser.add_argument("--num-classes-list",
                         type=list,
