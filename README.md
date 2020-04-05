@@ -39,7 +39,7 @@ The project structure is below:
 │   ├── train_harnn.py
 │   └── visualization.py
 ├── data
-│   ├── word2vec_100.model [Need Download]
+│   ├── word2vec_100.model.* [Need Download]
 │   ├── Test_sample.json
 │   ├── Train_sample.json
 │   └── Validation_sample.json
@@ -60,7 +60,9 @@ You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p
 
 ### Text Segment
 
-You can use `jieba` package if you are going to deal with the Chinese text data.
+1. You can use `nltk` package if you are going to deal with the English text data.
+
+2. You can use `jieba` package if you are going to deal with the Chinese text data.
 
 ### Data Format
 
@@ -121,7 +123,7 @@ the record should be construed as:
 ```
 
 This repository can be used in other datasets (text classification) in two ways:
-1. Modify your datasets into the same format of the sample.
+1. Modify your datasets into the same format of [the sample](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/tree/master/data).
 2. Modify the data preprocess code in `data_helpers.py`.
 
 Anyway, it should depend on what your data and task are.
@@ -132,6 +134,10 @@ You can pre-training your word vectors(based on your corpus) in many ways:
 - Use `gensim` package to pre-train data.
 - Use `glove` tools to pre-train data.
 - Even can use a **fasttext** network to pre-train data.
+
+## Usage
+
+See [Usage](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/blob/master/Usage.md).
 
 ## Network Structure
 
