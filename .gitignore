@@ -114,6 +114,7 @@ target/
 /HMC-LMLP
 /HMCN
 /SVM
+/HARNN/text_harnn_raw.py
 
 # Model File
 *.model
