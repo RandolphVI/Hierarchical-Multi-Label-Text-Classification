@@ -108,12 +108,12 @@ def parameter_parser():
     # Training Parameters
     parser.add_argument("--epochs",
                         type=int,
-                        default=10,
+                        default=20,
                         help="Number of training epochs. (default: 20)")
 
     parser.add_argument("--batch-size",
                         type=int,
-                        default=128,
+                        default=32,
                         help="Batch Size. (default: 128)")
 
     parser.add_argument("--learning-rate",
@@ -133,7 +133,7 @@ def parameter_parser():
 
     parser.add_argument("--evaluate-steps",
                         type=int,
-                        default=500,
+                        default=50,
                         help="Evaluate model on val set after how many steps. (default: 500)")
 
     parser.add_argument("--norm-ratio",
@@ -148,7 +148,7 @@ def parameter_parser():
 
     parser.add_argument("--checkpoint-steps",
                         type=int,
-                        default=500,
+                        default=50,
                         help="Save model after how many steps. (default: 500)")
 
     parser.add_argument("--num-checkpoints",
