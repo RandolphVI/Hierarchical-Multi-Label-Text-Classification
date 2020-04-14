@@ -23,8 +23,7 @@
   --attention-penalization  BOOL    Use attention penalization or not.                  Default is True.
   --fc-dim                  INT     Dim of FC neurons.                                  Default is 512.
   --dropout-rate            FLOAT   Dropout keep probability.                           Default is 0.5.
-  --alpha                   FLOAT   Weight of hierarchical violation in loss cal.       Default is 0.0.
-  --beta                    FLOAT   Weight of global part in loss cal.                  Default is 0.5.
+  --alpha                   FLOAT   Weight of global part in loss cal.                  Default is 0.5.
   --num-classes-list        LIST    Each number of labels in hierarchical structure.    Depends on data.
   --total-classes           INT     Total number of labels.                             Depends on data.
   --topK                    INT     Number of top K prediction classes.                 Default is 5.
@@ -35,11 +34,11 @@
 
 ```
   --epochs                  INT     Number of epochs.                       Default is 20.
-  --batch-size              INT     Batch size.                             Default is 128.
+  --batch-size              INT     Batch size.                             Default is 32.
   --learning-rate           FLOAT   Adam learning rate.                     Default is 0.001.
   --decay-rate              FLOAT   Rate of decay for learning rate.        Default is 0.95.
-  --decay-steps             INT     How many steps before decy lr.          Default is 500.
-  --evaluate-steps          INT     How many steps to evluate val set.      Default is 500.
+  --decay-steps             INT     How many steps before decy lr.          Default is 50.
+  --evaluate-steps          INT     How many steps to evluate val set.      Default is 50.
   --l2-lambda               FLOAT   L2 regularization lambda.               Default is 0.0.
   --checkpoint-steps        INT     How many steps to save model.           Default is 500.
   --num-checkpoints         INT     Number of checkpoints to store.         Default is 10.
