@@ -60,9 +60,7 @@ def train_harnn():
                 fc_hidden_size=args.fc_dim,
                 num_classes_list=args.num_classes_list,
                 total_classes=args.total_classes,
-                batch_size=args.batch_size,
                 l2_reg_lambda=args.l2_lambda,
-                alpha=args.alpha,
                 pretrained_embedding=pretrained_word2vec_matrix)
 
             # Define training procedure
@@ -141,7 +139,7 @@ def train_harnn():
                     harnn.input_y_fourth: y_batch_fourth,
                     harnn.input_y: y_batch,
                     harnn.dropout_keep_prob: args.dropout_rate,
-                    harnn.beta: args.beta,
+                    harnn.alpha: args.alpha,
                     harnn.is_training: True
                 }
                 _, step, summaries, loss = sess.run(
@@ -182,7 +180,7 @@ def train_harnn():
                         harnn.input_y_fourth: y_batch_val_fourth,
                         harnn.input_y: y_batch_val,
                         harnn.dropout_keep_prob: 1.0,
-                        harnn.beta: args.beta,
+                        harnn.alpha: args.alpha,
                         harnn.is_training: False
                     }
                     step, summaries, scores, cur_loss = sess.run(

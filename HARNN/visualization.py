@@ -77,7 +77,7 @@ def visualize():
             input_y_fourth = graph.get_operation_by_name("input_y_fourth").outputs[0]
             input_y = graph.get_operation_by_name("input_y").outputs[0]
             dropout_keep_prob = graph.get_operation_by_name("dropout_keep_prob").outputs[0]
-            beta = graph.get_operation_by_name("beta").outputs[0]
+            alpha = graph.get_operation_by_name("alpha").outputs[0]
             is_training = graph.get_operation_by_name("is_training").outputs[0]
 
             # Tensors we want to evaluate
@@ -116,7 +116,7 @@ def visualize():
                     input_y_fourth: y_batch_test_fourth,
                     input_y: y_batch_test,
                     dropout_keep_prob: 1.0,
-                    beta: args.beta,
+                    alpha: args.alpha,
                     is_training: False
                 }
                 batch_first_visual, batch_second_visual, batch_third_visual, batch_fourth_visual = \

@@ -9,8 +9,7 @@ class TextHARNN(object):
 
     def __init__(
             self, sequence_length, vocab_size, embedding_type, embedding_size, lstm_hidden_size, attention_unit_size,
-            fc_hidden_size, num_classes_list, total_classes, batch_size, l2_reg_lambda=0.0, alpha=0.0,
-            pretrained_embedding=None):
+            fc_hidden_size, num_classes_list, total_classes, l2_reg_lambda=0.0, pretrained_embedding=None):
 
         # Placeholders for input, output, dropout_prob and training_tag
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
@@ -20,7 +19,7 @@ class TextHARNN(object):
         self.input_y_fourth = tf.placeholder(tf.float32, [None, num_classes_list[3]], name="input_y_fourth")
         self.input_y = tf.placeholder(tf.float32, [None, total_classes], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
-        self.beta = tf.placeholder(tf.float32, name="beta")
+        self.alpha = tf.placeholder(tf.float32, name="alpha")
         self.is_training = tf.placeholder(tf.bool, name="is_training")
 
         self.global_step = tf.Variable(0, trainable=False, name="Global_Step")
@@ -147,28 +146,6 @@ class TextHARNN(object):
 
             return output
 
-        def _hierarchical_violation(parent_scores, child_scores):
-            """
-            Calculate the loss of Hierarchical Violation.
-            Args:
-                parent_scores: The parent scores list.
-                child_scores: The child scores list.
-            Returns:
-                The value of hierarchical violation loss.
-            """
-            index_list = [(0, 15), (15, 37), (52, 20), (72, 9), (81, 7), (88, 17), (106, 14), (120, 5), (125, 3)]
-            violation_losses = 0.0
-
-            for i in range(len(index_list)):
-                (left_index, step) = index_list[i]
-                current_parent_scores = tf.slice(parent_scores, [0, i], [batch_size, 1])
-                current_child_scores = tf.slice(child_scores, [0, left_index], [batch_size, step])
-                margin = tf.maximum((current_child_scores - current_parent_scores), 0)
-                losses = tf.reduce_mean(tf.reduce_sum(tf.square(margin), axis=1))
-                violation_losses = violation_losses + alpha * losses
-
-            return violation_losses
-
         # Embedding Layer
         with tf.device("/cpu:0"), tf.name_scope("embedding"):
             # Use random generated the word vector by default
@@ -269,7 +246,7 @@ class TextHARNN(object):
         with tf.name_scope("output"):
             self.local_scores = tf.concat([self.first_scores, self.second_scores,
                                            self.third_scores, self.fourth_scores], axis=1)
-            self.scores = tf.add(self.beta * self.global_scores, (1 - self.beta) * self.local_scores, name="scores")
+            self.scores = tf.add(self.alpha * self.global_scores, (1 - self.alpha) * self.local_scores, name="scores")
 
         # Calculate mean cross-entropy loss, L2 loss
         with tf.name_scope("loss"):
@@ -288,10 +265,7 @@ class TextHARNN(object):
             # Global Loss
             global_losses = cal_loss(labels=self.input_y, logits=self.global_logits, name="global_")
 
-            # Hierarchical violation Loss
-            violation_losses = _hierarchical_violation(self.first_scores, self.second_scores)
-
             # L2 Loss
             l2_losses = tf.add_n([tf.nn.l2_loss(tf.cast(v, tf.float32)) for v in tf.trainable_variables()],
                                  name="l2_losses") * l2_reg_lambda
-            self.loss = tf.add_n([local_losses, global_losses, violation_losses, l2_losses], name="loss")
+            self.loss = tf.add_n([local_losses, global_losses, l2_losses], name="loss")
