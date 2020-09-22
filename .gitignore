@@ -109,12 +109,11 @@ target/
 !/data/train_sample.json
 !/data/validation_sample.json
 !/data/test_sample.json
-/Pytorch-CNN
-/Clus-HMC
-/HMC-LMLP
-/HMCN
-/SVM
-/HARNN/text_harnn_raw.py
+
+# Project File
+TF/*
+!TF/HARNN
+!TF/utils
 
 # Model File
 *.model
