@@ -9,6 +9,7 @@ The main objective of the project is to solve the hierarchical multi-label text 
 ## Requirements
 
 - Python 3.6
+- PyTorch 1.6.0
 - Tensorflow 1.15.0
 - Tensorboard 1.15.0
 - Sklearn 0.19.1
@@ -36,20 +37,29 @@ The project structure is below:
 
 ```text
 .
-├── HARNN
-│   ├── test_harnn.py
-│   ├── text_harnn.py
-│   ├── train_harnn.py
-│   └── visualization.py
+├── TF(TensorFlow)
+│   ├── HARNN
+│   │   ├── test_tarnn.py
+│   │   ├── text_tarnn.py
+│   │   ├── train_tarnn.py
+│   │   └── visualization.py
+│   └── utils
+├── PyTorch
+│   ├── HARNN
+│   │   ├── train.py
+│   │   ├── layers.py
+│   │   ├── ham.py
+│   │   ├── test.py
+│   │   └── visualization.py
+│   └── utils
+│       ├── checkmate.py
+│       ├── param_parser.py
+│       └── data_helpers.py
 ├── data
 │   ├── word2vec_100.model.* [Need Download]
 │   ├── Test_sample.json
 │   ├── Train_sample.json
 │   └── Validation_sample.json
-└── utils
-│   ├── checkmate.py
-│   ├── data_helpers.py
-│   └── param_parser.py
 ├── LICENSE
 ├── README.md
 └── requirements.txt
@@ -140,7 +150,7 @@ You can pre-training your word vectors(based on your corpus) in many ways:
 
 ## Usage
 
-See [Usage](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/blob/master/Usage.md).
+See [Usage-TF](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/blob/master/Usage-TF.md) & [Usage-PyTorch](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/blob/master/Usage-PyTorch.md).
 
 ## Network Structure
 
