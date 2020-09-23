@@ -6,7 +6,7 @@ import tensorflow as tf
 
 
 class BestCheckpointSaver(object):
-    """Maintains a directory containing only the best n checkpoints
+    """Maintains a directory containing only the best n checkpoints.
     Inside the directory is a best_checkpoints JSON file containing a dictionary
     mapping of the best checkpoint filepaths to the values by which the checkpoints
     are compared.  Only the best n checkpoints are contained in the directory and JSON file.
