@@ -111,9 +111,9 @@ target/
 !/data/test_sample.json
 
 # Project File
-TF/*
-!TF/HARNN
-!TF/utils
+/HMC-LMLP
+/HMCN
+/SVM
 
 # Model File
 *.model
