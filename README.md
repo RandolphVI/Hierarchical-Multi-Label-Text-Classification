@@ -9,7 +9,6 @@ The main objective of the project is to solve the hierarchical multi-label text 
 ## Requirements
 
 - Python 3.6
-- PyTorch 1.6.0
 - Tensorflow 1.15.0
 - Tensorboard 1.15.0
 - Sklearn 0.19.1
@@ -37,24 +36,16 @@ The project structure is below:
 
 ```text
 .
-├── TF(TensorFlow)
-│   ├── HARNN
-│   │   ├── test_tarnn.py
-│   │   ├── text_tarnn.py
-│   │   ├── train_tarnn.py
-│   │   └── visualization.py
-│   └── utils
-├── PyTorch
-│   ├── HARNN
-│   │   ├── train.py
-│   │   ├── layers.py
-│   │   ├── ham.py
-│   │   ├── test.py
-│   │   └── visualization.py
-│   └── utils
-│       ├── checkmate.py
-│       ├── param_parser.py
-│       └── data_helpers.py
+├── HARNN
+│   ├── train.py
+│   ├── layers.py
+│   ├── ham.py
+│   ├── test.py
+│   └── visualization.py
+├── utils
+│   ├── checkmate.py
+│   ├── param_parser.py
+│   └── data_helpers.py
 ├── data
 │   ├── word2vec_100.model.* [Need Download]
 │   ├── Test_sample.json
@@ -82,7 +73,7 @@ You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p
 See data format in `data` folder which including the data sample files. For example:
 
 ```json
-{"id": "3930316", "title": ["sighting", "firearm"], "abstract": ["rear", "sight", "firearm", "ha", "peephole", "device", "formed", "hollow", "tube", "end", "closed", "peephole",], "section": [5], "subsection": [104], "group": [512], "subgroup": [6535], "labels": [5, 113, 649, 7333]}
+{"id": "3930316", "title": ["sighting", "firearm"], "abstract": ["rear", "sight", "firearm", "ha", "peephole", "device", "formed", "hollow", "tube", "end", "closed", "peephole"], "section": [5], "subsection": [104], "group": [512], "subgroup": [6535], "labels": [5, 113, 649, 7333]}
 ```
 
 - **"id"**: just the id.
@@ -150,7 +141,7 @@ You can pre-training your word vectors(based on your corpus) in many ways:
 
 ## Usage
 
-See [Usage-TF](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/blob/master/Usage-TF.md) & [Usage-PyTorch](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/blob/master/Usage-PyTorch.md).
+See [Usage](https://github.com/RandolphVI/Hierarchical-Multi-Label-Text-Classification/blob/master/Usage.md).
 
 ## Network Structure
 
