@@ -7,7 +7,6 @@ import tensorflow as tf
 
 class BestCheckpointSaver(object):
     """Maintains a directory containing only the best n checkpoints.
-
     Inside the directory is a best_checkpoints JSON file containing a dictionary
     mapping of the best checkpoint filepaths to the values by which the checkpoints
     are compared.  Only the best n checkpoints are contained in the directory and JSON file.
@@ -17,7 +16,6 @@ class BestCheckpointSaver(object):
     """
     def __init__(self, save_dir, num_to_keep=1, maximize=True, saver=None):
         """Creates a `BestCheckpointSaver`.
-
         `BestCheckpointSaver` acts as a wrapper class around a `tf.train.Saver`.
 
         Args:
@@ -119,7 +117,6 @@ class BestCheckpointSaver(object):
 
 def get_best_checkpoint(best_checkpoint_dir, select_maximum_value=True):
     """Returns filepath to the best checkpoint.
-
     Reads the best_checkpoints file in the best_checkpoint_dir directory.
     Returns the filepath in the best_checkpoints file associated with
     the highest value if select_maximum_value is True, or the filepath
