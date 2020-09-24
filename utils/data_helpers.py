@@ -86,13 +86,13 @@ def tab_printer(args, logger):
 
 def get_out_dir(option, logger):
     """
-    Get the out dir.
+    Get the out dir for saving model checkpoints.
 
     Args:
         option: Train or Restore.
         logger: The logger.
     Returns:
-        The output dir.
+        The output dir for model checkpoints.
     """
     if option == 'T':
         timestamp = str(int(time.time()))
@@ -157,15 +157,14 @@ def create_prediction_file(output_file, data_id, all_labels, all_predict_labels,
 
 def get_onehot_label_threshold(scores, threshold=0.5):
     """
-    Get the predicted onehot labels based on the threshold.
-
+    Get the predicted one-hot labels based on the threshold.
     If there is no predict score greater than threshold, then choose the label which has the max predict score.
 
     Args:
         scores: The all classes predicted scores provided by network.
         threshold: The threshold (default: 0.5).
     Returns:
-        predicted_onehot_labels: The predicted labels (onehot).
+        predicted_onehot_labels: The predicted labels (one-hot).
     """
     predicted_onehot_labels = []
     scores = np.ndarray.tolist(scores)
@@ -185,13 +184,13 @@ def get_onehot_label_threshold(scores, threshold=0.5):
 
 def get_onehot_label_topk(scores, top_num=1):
     """
-    Get the predicted onehot labels based on the topK number.
+    Get the predicted one-hot labels based on the topK.
 
     Args:
         scores: The all classes predicted scores provided by network.
         top_num: The max topK number (default: 5).
     Returns:
-        predicted_onehot_labels: The predicted labels (onehot).
+        predicted_onehot_labels: The predicted labels (one-hot).
     """
     predicted_onehot_labels = []
     scores = np.ndarray.tolist(scores)
@@ -207,7 +206,6 @@ def get_onehot_label_topk(scores, top_num=1):
 def get_label_threshold(scores, threshold=0.5):
     """
     Get the predicted labels based on the threshold.
-
     If there is no predict score greater than threshold, then choose the label which has the max predict score.
 
     Args:
@@ -239,7 +237,7 @@ def get_label_threshold(scores, threshold=0.5):
 
 def get_label_topk(scores, top_num=1):
     """
-    Get the predicted labels based on the topK number.
+    Get the predicted labels based on the topK.
 
     Args:
         scores: The all classes predicted scores provided by network.
@@ -314,8 +312,7 @@ def load_word2vec_matrix(word2vec_file):
 
 def load_data_and_labels(args, input_file):
     """
-    Load research data from files, splits the data into words and generates labels.
-    Return split sentences, labels and the max sentence length of the research data.
+    Load research data from files, padding sentences and generate one-hot labels.
 
     Args:
         args: The arguments.
