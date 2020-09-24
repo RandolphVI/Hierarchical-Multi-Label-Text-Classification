@@ -124,7 +124,7 @@ def get_best_checkpoint(best_checkpoint_dir, select_maximum_value=True):
     Returns the filepath in the best_checkpoints file associated with
     the highest value if select_maximum_value is True, or the filepath
     associated with the lowest value if select_maximum_value is False.
-    
+
     Args:
         best_checkpoint_dir: Directory containing best_checkpoints JSON file
         select_maximum_value: If True, select the filepath associated
