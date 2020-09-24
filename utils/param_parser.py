@@ -133,7 +133,7 @@ def parameter_parser():
 
     parser.add_argument("--evaluate-steps",
                         type=int,
-                        default=50,
+                        default=10,
                         help="Evaluate model on val set after how many steps. (default: 50)")
 
     parser.add_argument("--norm-ratio",

@@ -16,14 +16,15 @@ from tflearn.data_utils import pad_sequences
 
 
 def _option(pattern):
-    """
-    Get the option according to the pattern.
-    (pattern 0: Choose training or restore; pattern 1: Choose best or latest checkpoint.)
+    """Get the option according to the pattern.
+
+    pattern 0: Choose training or restore.
+    pattern 1: Choose best or latest checkpoint.
 
     Args:
         pattern: 0 for training step. 1 for testing step.
     Returns:
-        The OPTION
+        The OPTION.
     """
     if pattern == 0:
         OPTION = input("[Input] Train or Restore? (T/R): ")
@@ -37,15 +38,14 @@ def _option(pattern):
 
 
 def logger_fn(name, input_file, level=logging.INFO):
-    """
-    The Logger.
+    """The Logger.
 
     Args:
-        name: The name of the logger
-        input_file: The logger file path
-        level: The logger level
+        name: The name of the logger.
+        input_file: The logger file path.
+        level: The logger level.
     Returns:
-        The logger
+        The logger.
     """
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -68,12 +68,11 @@ def logger_fn(name, input_file, level=logging.INFO):
 
 
 def tab_printer(args, logger):
-    """
-    Function to print the logs in a nice tabular format.
+    """Function to print the logs in a nice tabular format.
 
     Args:
         args: Parameters used for the model.
-        logger: The logger
+        logger: The logger.
     """
     args = vars(args)
     keys = sorted(args.keys())
@@ -84,14 +83,13 @@ def tab_printer(args, logger):
 
 
 def get_out_dir(option, logger):
-    """
-    Get the out dir.
+    """Get the out dir.
 
     Args:
-        option: Train or Restore
-        logger: The logger
+        option: Train or Restore.
+        logger: The logger.
     Returns:
-        The output dir
+        The output dir.
     """
     if option == 'T':
         timestamp = str(int(time.time()))
@@ -109,11 +107,10 @@ def get_out_dir(option, logger):
 
 
 def get_model_name():
-    """
-    Get the model name used for test.
+    """Get the model name used for test.
 
     Returns:
-        The model name
+        The model name.
     """
     MODEL = input("[Input] Please input the model file you want to test, it should be like (1490175368): ")
 
@@ -124,17 +121,16 @@ def get_model_name():
 
 
 def create_prediction_file(output_file, data_id, all_labels, all_predict_labels, all_predict_scores):
-    """
-    Create the prediction file.
+    """Create the prediction file.
 
     Args:
-        output_file: The all classes predicted results provided by network
-        data_id: The data record id info provided by class Data
-        all_labels: The all origin labels
-        all_predict_labels: The all predict labels by threshold
-        all_predict_scores: The all predict scores by threshold
+        output_file: The all classes predicted results provided by network.
+        data_id: The data record id info provided by dict <Data>.
+        all_labels: The all true labels.
+        all_predict_labels: The all predict labels by threshold.
+        all_predict_scores: The all predict scores by threshold.
     Raises:
-        IOError: If the prediction file is not a .json file
+        IOError: If the prediction file is not a .json file.
     """
     if not output_file.endswith('.json'):
         raise IOError("[Error] The prediction file is not a json file."
@@ -155,15 +151,15 @@ def create_prediction_file(output_file, data_id, all_labels, all_predict_labels,
 
 
 def get_onehot_label_threshold(scores, threshold=0.5):
-    """
-    Get the predicted onehot labels based on the threshold.
+    """Get the predicted onehot labels based on the threshold.
+
     If there is no predict score greater than threshold, then choose the label which has the max predict score.
 
     Args:
-        scores: The all classes predicted scores provided by network
-        threshold: The threshold (default: 0.5)
+        scores: The all classes predicted scores provided by network.
+        threshold: The threshold (default: 0.5).
     Returns:
-        predicted_onehot_labels: The predicted labels (onehot)
+        predicted_onehot_labels: The predicted labels (onehot).
     """
     predicted_onehot_labels = []
     scores = np.ndarray.tolist(scores)
@@ -182,14 +178,13 @@ def get_onehot_label_threshold(scores, threshold=0.5):
 
 
 def get_onehot_label_topk(scores, top_num=1):
-    """
-    Get the predicted onehot labels based on the topK number.
+    """Get the predicted onehot labels based on the topK number.
 
     Args:
-        scores: The all classes predicted scores provided by network
-        top_num: The max topK number (default: 5)
+        scores: The all classes predicted scores provided by network.
+        top_num: The max topK number (default: 5).
     Returns:
-        predicted_onehot_labels: The predicted labels (onehot)
+        predicted_onehot_labels: The predicted labels (onehot).
     """
     predicted_onehot_labels = []
     scores = np.ndarray.tolist(scores)
@@ -203,16 +198,16 @@ def get_onehot_label_topk(scores, top_num=1):
 
 
 def get_label_threshold(scores, threshold=0.5):
-    """
-    Get the predicted labels based on the threshold.
+    """Get the predicted labels based on the threshold.
+
     If there is no predict score greater than threshold, then choose the label which has the max predict score.
 
     Args:
-        scores: The all classes predicted scores provided by network
-        threshold: The threshold (default: 0.5)
+        scores: The all classes predicted scores provided by network.
+        threshold: The threshold (default: 0.5).
     Returns:
-        predicted_labels: The predicted labels
-        predicted_scores: The predicted scores
+        predicted_labels: The predicted labels.
+        predicted_scores: The predicted scores.
     """
     predicted_labels = []
     predicted_scores = []
@@ -235,14 +230,13 @@ def get_label_threshold(scores, threshold=0.5):
 
 
 def get_label_topk(scores, top_num=1):
-    """
-    Get the predicted labels based on the topK number.
+    """Get the predicted labels based on the topK number.
 
     Args:
-        scores: The all classes predicted scores provided by network
-        top_num: The max topK number (default: 5)
+        scores: The all classes predicted scores provided by network.
+        top_num: The max topK number (default: 5).
     Returns:
-        The predicted labels
+        The predicted labels.
     """
     predicted_labels = []
     predicted_scores = []
@@ -259,14 +253,13 @@ def get_label_topk(scores, top_num=1):
 
 
 def create_metadata_file(word2vec_file, output_file):
-    """
-    Create the metadata file based on the corpus file (Used for the Embedding Visualization later).
+    """Create the metadata file based on the corpus file (Used for the Embedding Visualization later).
 
     Args:
-        word2vec_file: The word2vec file
-        output_file: The metadata file path
+        word2vec_file: The word2vec file.
+        output_file: The metadata file path.
     Raises:
-        IOError: If word2vec model file doesn't exist
+        IOError: If word2vec model file doesn't exist.
     """
     if not os.path.isfile(word2vec_file):
         raise IOError("[Error] The word2vec file doesn't exist.")
@@ -285,15 +278,14 @@ def create_metadata_file(word2vec_file, output_file):
 
 
 def load_word2vec_matrix(word2vec_file):
-    """
-    Return the word2vec model matrix.
+    """Get the word2vec model matrix.
 
     Args:
-        word2vec_file: The word2vec file
+        word2vec_file: The word2vec file.
     Returns:
-        The word2vec model matrix
+        The word2vec model matrix.
     Raises:
-        IOError: If word2vec model file doesn't exist
+        IOError: If word2vec model file doesn't exist.
     """
     if not os.path.isfile(word2vec_file):
         raise IOError("[Error] The word2vec file doesn't exist. ")
@@ -310,7 +302,8 @@ def load_word2vec_matrix(word2vec_file):
 
 
 def load_data_and_labels(args, input_file):
-    """
+    """Load data and labels.
+
     Load research data from files, splits the data into words and generates labels.
     Return split sentences, labels and the max sentence length of the research data.
 
@@ -379,24 +372,24 @@ def load_data_and_labels(args, input_file):
             Data['subgroup'].append(_create_onehot_labels(subgroup, args.num_classes_list[3]))
             Data['onehot_labels'].append(_create_onehot_labels(labels, args.total_classes))
             Data['labels'].append(labels)
-
         Data['pad_seqs'] = pad_sequences(Data['content_index'], maxlen=args.pad_seq_len, value=0.)
     return Data
 
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
-    """
+    """ Batch iterator.
+
     含有 yield 说明不是一个普通函数，是一个 Generator.
     函数效果：对 data，一共分成 num_epochs 个阶段（epoch），在每个 epoch 内，如果 shuffle=True，就将 data 重新洗牌，
     批量生成 (yield) 一批一批的重洗过的 data，每批大小是 batch_size，一共生成 int(len(data)/batch_size)+1 批。
 
     Args:
-        data: The data
-        batch_size: The size of the data batch
-        num_epochs: The number of epochs
-        shuffle: Shuffle or not (default: True)
+        data: The data.
+        batch_size: The size of the data batch.
+        num_epochs: The number of epochs.
+        shuffle: Shuffle or not (default: True).
     Returns:
-        A batch iterator for data set
+        A batch iterator for data set.
     """
     data = np.array(data)
     data_size = len(data)

@@ -23,8 +23,8 @@ logger = dh.logger_fn("tflog", "logs/{0}-{1}.log".format('Train' if OPTION == 'T
 
 
 def create_input_data(data: dict):
-    return zip(data['pad_seqs'], data['section'], data['subsection'], data['group'],
-               data['subgroup'], data['onehot_labels'], data['labels'])
+    return zip(data['pad_seqs'], data['section'], data['subsection'],
+               data['group'], data['subgroup'], data['onehot_labels'])
 
 
 def train_harnn():
@@ -124,8 +124,8 @@ def train_harnn():
             current_step = sess.run(harnn.global_step)
 
             def train_step(batch_data):
-                """A single training step"""
-                x, sec, subsec, group, subgroup, y_onehot, y = zip(*batch_data)
+                """A single training step."""
+                x, sec, subsec, group, subgroup, y_onehot = zip(*batch_data)
 
                 feed_dict = {
                     harnn.input_x: x,
@@ -144,7 +144,7 @@ def train_harnn():
                 train_summary_writer.add_summary(summaries, step)
 
             def validation_step(val_loader, writer=None):
-                """Evaluates model on a validation set"""
+                """Evaluates model on a validation set."""
                 batches_validation = dh.batch_iter(
                     list(create_input_data(val_loader)), args.batch_size, 1)
 
@@ -161,7 +161,7 @@ def train_harnn():
                 predicted_onehot_labels_tk = [[] for _ in range(args.topK)]
 
                 for batch_validation in batches_validation:
-                    x, sec, subsec, group, subgroup, y_onehot, y = zip(*batch_validation)
+                    x, sec, subsec, group, subgroup, y_onehot = zip(*batch_validation)
 
                     feed_dict = {
                         harnn.input_x: x,

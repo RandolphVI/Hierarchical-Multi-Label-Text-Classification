@@ -25,12 +25,13 @@ class TextHARNN(object):
         self.global_step = tf.Variable(0, trainable=False, name="Global_Step")
 
         def _attention(input_x, num_classes, name=""):
-            """
-            Attention Layer.
+            """Attention Layer.
+
             Args:
                 input_x: [batch_size, sequence_length, lstm_hidden_size * 2]
                 num_classes: The number of i th level classes
                 name: Scope name
+
             Returns:
                 attention_matrix: [batch_size, num_classes, sequence_length]
                 attention_weight: [batch_size, num_classes, sequence_length]
@@ -58,11 +59,12 @@ class TextHARNN(object):
             return attention_weight, attention_out
 
         def _fc_layer(input_x, name=""):
-            """
-            Fully Connected Layer.
+            """Fully Connected Layer.
+
             Args:
                 input_x: 
                 name: Scope name
+
             Returns:
                 [batch_size, fc_hidden_size]
             """
@@ -76,13 +78,14 @@ class TextHARNN(object):
             return fc_out
 
         def _local_layer(input_x, input_att_weight, num_classes, name=""):
-            """
-            Local Layer
+            """Local Layer.
+
             Args:
                 input_x: [batch_size, fc_hidden_size]
                 input_att_weight: [batch_size, num_classes, sequence_length]
                 num_classes: Number of classes
                 name: Scope name
+
             Returns:
                 logits: [batch_size, num_classes]
                 scores: [batch_size, num_classes]
@@ -103,16 +106,18 @@ class TextHARNN(object):
             return logits, scores, visual
 
         def _linear(input_, output_size, initializer=None, scope="SimpleLinear"):
-            """
-            Linear map: output[k] = sum_i(Matrix[k, i] * args[i] ) + Bias[k]
+            """Linear map: output[k] = sum_i(Matrix[k, i] * args[i] ) + Bias[k].
+
             Args:
                 input_: a tensor or a list of 2D, batch x n, Tensors.
                 output_size: int, second dimension of W[i].
                 initializer: The initializer.
                 scope: VariableScope for the created subgraph; defaults to "SimpleLinear".
+
             Returns:
                 A 2D Tensor with shape [batch x output_size] equal to
                 sum_i(args[i] * W[i]), where W[i]s are newly created matrices.
+
             Raises:
                 ValueError: if some of the arguments has unspecified or wrong shape.
             """
@@ -132,8 +137,8 @@ class TextHARNN(object):
             return tf.nn.xw_plus_b(input_, W, b)
 
         def _highway_layer(input_, size, num_layers=1, bias=-2.0):
-            """
-            Highway Network (cf. http://arxiv.org/abs/1505.00387).
+            """Highway Network (cf. http://arxiv.org/abs/1505.00387).
+
             t = sigmoid(Wx + b); h = relu(W'x + b')
             z = t * h + (1 - t) * x
             where t is transform gate, and (1 - t) is carry gate.

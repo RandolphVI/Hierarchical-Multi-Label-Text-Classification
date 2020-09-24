@@ -24,7 +24,7 @@ SAVE_DIR = 'output/' + MODEL
 
 def create_input_data(data: dict):
     return zip(data['pad_seqs'], data['content'], data['section'], data['subsection'], data['group'],
-               data['subgroup'], data['onehot_labels'], data['labels'])
+               data['subgroup'], data['onehot_labels'])
 
 
 def normalization(visual_list, visual_len):
@@ -43,10 +43,10 @@ def create_visual_file(input_x, visual_list: list, seq_len):
     f = open('attention.html', 'w')
     f.write('<html style="margin:0;padding:0;"><body style="margin:0;padding:0;">\n')
     f.write('<div style="margin:25px;">\n')
-    for index in range(len(visual_list)):
+    for index, visual in enumerate(visual_list):
         f.write('<p style="margin:10px;">\n')
         for i in range(seq_len):
-            alpha = "{:.2f}".format(visual_list[index][i])
+            alpha = "{:.2f}".format(visual[i])
             word = input_x[0][i]
             f.write('\t<span style="margin-left:3px;background-color:rgba(255,0,0,{0})">{1}</span>\n'
                     .format(alpha, word))
@@ -102,7 +102,6 @@ def visualize():
             second_visual = graph.get_operation_by_name("second-output/visual").outputs[0]
             third_visual = graph.get_operation_by_name("third-output/visual").outputs[0]
             fourth_visual = graph.get_operation_by_name("fourth-output/visual").outputs[0]
-            scores = graph.get_operation_by_name("output/scores").outputs[0]
 
             # Split the output nodes name by '|' if you have several output nodes
             output_node_names = "first-output/visual|second-output/visual|third-output/visual|fourth-output/visual|output/scores"
@@ -116,7 +115,7 @@ def visualize():
             batches = dh.batch_iter(list(create_input_data(test_data)), args.batch_size, 1, shuffle=False)
 
             for batch_test in batches:
-                x, x_content, sec, subsec, group, subgroup, y_onehot, y = zip(*batch_test)
+                x, x_content, sec, subsec, group, subgroup, y_onehot = zip(*batch_test)
 
                 feed_dict = {
                     input_x: x,
@@ -139,8 +138,8 @@ def visualize():
                 length = (pad_len if seq_len >= pad_len else seq_len)
                 visual_list = []
 
-                for index in range(len(batch_visual)):
-                    visual_list.append(normalization(batch_visual[index][0].tolist(), length))
+                for visual in batch_visual:
+                    visual_list.append(normalization(visual[0].tolist(), length))
 
                 create_visual_file(x_content, visual_list, seq_len)
 
