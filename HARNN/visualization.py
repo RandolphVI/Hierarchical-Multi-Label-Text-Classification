@@ -142,7 +142,6 @@ def visualize():
                 for index in range(len(batch_visual)):
                     visual_list.append(normalization(batch_visual[index][0].tolist(), length))
 
-                print(seq_len, pad_len, length)
                 create_visual_file(x_content, visual_list, seq_len)
 
 
