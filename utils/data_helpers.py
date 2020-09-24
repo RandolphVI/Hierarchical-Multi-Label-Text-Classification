@@ -16,8 +16,8 @@ from tflearn.data_utils import pad_sequences
 
 
 def _option(pattern):
-    """Get the option according to the pattern.
-
+    """
+    Get the option according to the pattern.
     pattern 0: Choose training or restore.
     pattern 1: Choose best or latest checkpoint.
 
@@ -38,7 +38,8 @@ def _option(pattern):
 
 
 def logger_fn(name, input_file, level=logging.INFO):
-    """The Logger.
+    """
+    The Logger.
 
     Args:
         name: The name of the logger.
@@ -68,7 +69,8 @@ def logger_fn(name, input_file, level=logging.INFO):
 
 
 def tab_printer(args, logger):
-    """Function to print the logs in a nice tabular format.
+    """
+    Function to print the logs in a nice tabular format.
 
     Args:
         args: Parameters used for the model.
@@ -83,7 +85,8 @@ def tab_printer(args, logger):
 
 
 def get_out_dir(option, logger):
-    """Get the out dir.
+    """
+    Get the out dir.
 
     Args:
         option: Train or Restore.
@@ -107,7 +110,8 @@ def get_out_dir(option, logger):
 
 
 def get_model_name():
-    """Get the model name used for test.
+    """
+    Get the model name used for test.
 
     Returns:
         The model name.
@@ -121,7 +125,8 @@ def get_model_name():
 
 
 def create_prediction_file(output_file, data_id, all_labels, all_predict_labels, all_predict_scores):
-    """Create the prediction file.
+    """
+    Create the prediction file.
 
     Args:
         output_file: The all classes predicted results provided by network.
@@ -151,7 +156,8 @@ def create_prediction_file(output_file, data_id, all_labels, all_predict_labels,
 
 
 def get_onehot_label_threshold(scores, threshold=0.5):
-    """Get the predicted onehot labels based on the threshold.
+    """
+    Get the predicted onehot labels based on the threshold.
 
     If there is no predict score greater than threshold, then choose the label which has the max predict score.
 
@@ -178,7 +184,8 @@ def get_onehot_label_threshold(scores, threshold=0.5):
 
 
 def get_onehot_label_topk(scores, top_num=1):
-    """Get the predicted onehot labels based on the topK number.
+    """
+    Get the predicted onehot labels based on the topK number.
 
     Args:
         scores: The all classes predicted scores provided by network.
@@ -198,7 +205,8 @@ def get_onehot_label_topk(scores, top_num=1):
 
 
 def get_label_threshold(scores, threshold=0.5):
-    """Get the predicted labels based on the threshold.
+    """
+    Get the predicted labels based on the threshold.
 
     If there is no predict score greater than threshold, then choose the label which has the max predict score.
 
@@ -230,7 +238,8 @@ def get_label_threshold(scores, threshold=0.5):
 
 
 def get_label_topk(scores, top_num=1):
-    """Get the predicted labels based on the topK number.
+    """
+    Get the predicted labels based on the topK number.
 
     Args:
         scores: The all classes predicted scores provided by network.
@@ -253,7 +262,8 @@ def get_label_topk(scores, top_num=1):
 
 
 def create_metadata_file(word2vec_file, output_file):
-    """Create the metadata file based on the corpus file (Used for the Embedding Visualization later).
+    """
+    Create the metadata file based on the corpus file (Used for the Embedding Visualization later).
 
     Args:
         word2vec_file: The word2vec file.
@@ -278,7 +288,8 @@ def create_metadata_file(word2vec_file, output_file):
 
 
 def load_word2vec_matrix(word2vec_file):
-    """Get the word2vec model matrix.
+    """
+    Get the word2vec model matrix.
 
     Args:
         word2vec_file: The word2vec file.
@@ -302,8 +313,7 @@ def load_word2vec_matrix(word2vec_file):
 
 
 def load_data_and_labels(args, input_file):
-    """Load data and labels.
-
+    """
     Load research data from files, splits the data into words and generates labels.
     Return split sentences, labels and the max sentence length of the research data.
 
@@ -377,8 +387,7 @@ def load_data_and_labels(args, input_file):
 
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
-    """ Batch iterator.
-
+    """
     含有 yield 说明不是一个普通函数，是一个 Generator.
     函数效果：对 data，一共分成 num_epochs 个阶段（epoch），在每个 epoch 内，如果 shuffle=True，就将 data 重新洗牌，
     批量生成 (yield) 一批一批的重洗过的 data，每批大小是 batch_size，一共生成 int(len(data)/batch_size)+1 批。

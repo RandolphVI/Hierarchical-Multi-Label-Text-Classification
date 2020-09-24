@@ -43,7 +43,7 @@ def create_visual_file(input_x, visual_list: list, seq_len):
     f = open('attention.html', 'w')
     f.write('<html style="margin:0;padding:0;"><body style="margin:0;padding:0;">\n')
     f.write('<div style="margin:25px;">\n')
-    for index, visual in enumerate(visual_list):
+    for visual in visual_list:
         f.write('<p style="margin:10px;">\n')
         for i in range(seq_len):
             alpha = "{:.2f}".format(visual[i])
