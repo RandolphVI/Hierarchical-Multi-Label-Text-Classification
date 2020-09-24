@@ -11,27 +11,27 @@ def parameter_parser():
     # Data Parameters
     parser.add_argument("--train-file",
                         nargs="?",
-                        default="../../data/Train_sample.json",
+                        default="../data/Train_sample.json",
                         help="Training data.")
 
     parser.add_argument("--validation-file",
                         nargs="?",
-                        default="../../data/Validation_sample.json",
+                        default="../data/Validation_sample.json",
                         help="Validation data.")
 
     parser.add_argument("--test-file",
                         nargs="?",
-                        default="../../data/Test_sample.json",
+                        default="../data/Test_sample.json",
                         help="Testing data.")
 
     parser.add_argument("--metadata-file",
                         nargs="?",
-                        default="../../data/metadata.tsv",
+                        default="../data/metadata.tsv",
                         help="Metadata file for embedding visualization.")
 
     parser.add_argument("--word2vec-file",
                         nargs="?",
-                        default="../../data/word2vec_100.model",
+                        default="../data/word2vec_100.model",
                         help="Word2vec file for embedding characters (the dim need to be the same as embedding dim).")
 
     # Model Hyperparameters
@@ -148,7 +148,7 @@ def parameter_parser():
 
     parser.add_argument("--checkpoint-steps",
                         type=int,
-                        default=50,
+                        default=10,
                         help="Save model after how many steps. (default: 50)")
 
     parser.add_argument("--num-checkpoints",

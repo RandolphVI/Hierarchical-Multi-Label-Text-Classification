@@ -309,26 +309,33 @@ def load_word2vec_matrix(word2vec_file):
     return vocab_size, embedding_size, embedding_matrix
 
 
-def data_word2vec(input_file, num_classes_list, total_classes, word2vec_model):
+def load_data_and_labels(args, input_file):
     """
-    Create the research data tokenindex based on the word2vec model file.
-    Return the class Data(includes the data tokenindex and data labels).
+    Load research data from files, splits the data into words and generates labels.
+    Return split sentences, labels and the max sentence length of the research data.
 
     Args:
-        input_file: The research data
-        num_classes_list: <list> The number of classes
-        total_classes: The total number of classes
-        word2vec_model: The word2vec model file
+        args: The arguments.
+        input_file: The research record.
     Returns:
-        The Class _Data() (includes the data tokenindex and data labels)
+        The dict <Data> (includes the record tokenindex and record labels)
     Raises:
-        IOError: If the input file is not the .json file
+        IOError: If word2vec model file doesn't exist
     """
+    # Load word2vec file
+    if not os.path.isfile(args.word2vec_file):
+        raise IOError("[Error] The word2vec file doesn't exist. ")
+
+    if not input_file.endswith('.json'):
+        raise IOError("[Error] The research record is not a json file. "
+                      "Please preprocess the research record into the json file.")
+
+    word2vec_model = word2vec.Word2Vec.load(args.word2vec_file)
     vocab = dict([(k, v.index) for (k, v) in word2vec_model.wv.vocab.items()])
 
-    def _token_to_index(content):
+    def _token_to_index(x):
         result = []
-        for item in content:
+        for item in x:
             word2id = vocab.get(item)
             if word2id is None:
                 word2id = 0
@@ -341,212 +348,40 @@ def data_word2vec(input_file, num_classes_list, total_classes, word2vec_model):
             label[int(item)] = 1
         return label
 
-    if not input_file.endswith('.json'):
-        raise IOError("[Error] The research data is not a json file. "
-                      "Please preprocess the research data into the json file.")
+    Data = dict()
     with open(input_file) as fin:
-        id_list = []
-        title_index_list = []
-        abstract_index_list = []
-        abstract_content_list = []
-        labels_list = []
-        onehot_labels_list = []
-        onehot_labels_tuple_list = []
-        total_line = 0
+        Data['id'] = []
+        Data['content_index'] = []
+        Data['content'] = []
+        Data['section'] = []
+        Data['subsection'] = []
+        Data['group'] = []
+        Data['subgroup'] = []
+        Data['onehot_labels'] = []
+        Data['labels'] = []
 
         for eachline in fin:
-            data = json.loads(eachline)
-            patent_id = data['id']
-            title_content = data['title']
-            abstract_content = data['abstract']
-            first_labels = data['section']
-            second_labels = data['subsection']
-            third_labels = data['group']
-            fourth_labels = data['subgroup']
-            total_labels = data['labels']
+            record = json.loads(eachline)
+            id = record['id']
+            content = record['abstract']
+            section = record['section']
+            subsection = record['subsection']
+            group = record['group']
+            subgroup = record['subgroup']
+            labels = record['labels']
 
-            id_list.append(patent_id)
-            title_index_list.append(_token_to_index(title_content))
-            abstract_index_list.append(_token_to_index(abstract_content))
-            abstract_content_list.append(abstract_content)
-            labels_list.append(total_labels)
-            labels_tuple = (_create_onehot_labels(first_labels, num_classes_list[0]),
-                            _create_onehot_labels(second_labels, num_classes_list[1]),
-                            _create_onehot_labels(third_labels, num_classes_list[2]),
-                            _create_onehot_labels(fourth_labels, num_classes_list[3]))
+            Data['id'].append(id)
+            Data['content_index'].append(_token_to_index(content))
+            Data['content'].append(content)
+            Data['section'].append(_create_onehot_labels(section, args.num_classes_list[0]))
+            Data['subsection'].append(_create_onehot_labels(subsection, args.num_classes_list[1]))
+            Data['group'].append(_create_onehot_labels(group, args.num_classes_list[2]))
+            Data['subgroup'].append(_create_onehot_labels(subgroup, args.num_classes_list[3]))
+            Data['onehot_labels'].append(_create_onehot_labels(labels, args.total_classes))
+            Data['labels'].append(labels)
 
-            onehot_labels_tuple_list.append(labels_tuple)
-            onehot_labels_list.append(_create_onehot_labels(total_labels, total_classes))
-            total_line += 1
-
-    class _Data:
-        def __init__(self):
-            pass
-
-        @property
-        def number(self):
-            return total_line
-
-        @property
-        def patent_id(self):
-            return id_list
-
-        @property
-        def title_tokenindex(self):
-            return title_index_list
-
-        @property
-        def abstract_tokenindex(self):
-            return abstract_index_list
-
-        @property
-        def abstract_content(self):
-            return abstract_content_list
-
-        @property
-        def labels(self):
-            return labels_list
-
-        @property
-        def onehot_labels_tuple(self):
-            return onehot_labels_tuple_list
-
-        @property
-        def onehot_labels(self):
-            return onehot_labels_list
-
-    return _Data()
-
-
-def data_augmented(data, drop_rate=1.0):
-    """
-    Data augment.
-
-    Args:
-        data: The Class _Data()
-        drop_rate: The drop rate
-    Returns:
-        The Class _AugData()
-    """
-    aug_num = data.number
-    aug_patent_id = data.patent_id
-    aug_title_tokenindex = data.title_tokenindex
-    aug_abstract_tokenindex = data.abstract_tokenindex
-    aug_labels = data.labels
-    aug_onehot_labels = data.onehot_labels
-    aug_onehot_labels_tuple = data.onehot_labels_tuple
-
-    for i in range(len(data.aug_abstract_tokenindex)):
-        data_record = data.tokenindex[i]
-        if len(data_record) == 1:  # 句子长度为 1，则不进行增广
-            continue
-        elif len(data_record) == 2:  # 句子长度为 2，则交换两个词的顺序
-            data_record[0], data_record[1] = data_record[1], data_record[0]
-            aug_patent_id.append(data.patent_id[i])
-            aug_title_tokenindex.append(data.title_tokenindex[i])
-            aug_abstract_tokenindex.append(data_record)
-            aug_labels.append(data.labels[i])
-            aug_onehot_labels.append(data.onehot_labels[i])
-            aug_onehot_labels_tuple.append(data.onehot_labels_tuple[i])
-            aug_num += 1
-        else:
-            data_record = np.array(data_record)
-            for num in range(len(data_record) // 10):  # 打乱词的次数，次数即生成样本的个数；次数根据句子长度而定
-                # random shuffle & random drop
-                data_shuffled = np.random.permutation(np.arange(int(len(data_record) * drop_rate)))
-                new_data_record = data_record[data_shuffled]
-
-                aug_patent_id.append(data.patent_id[i])
-                aug_title_tokenindex.append(data.title_tokenindex[i])
-                aug_abstract_tokenindex.append(list(new_data_record))
-                aug_labels.append(data.labels[i])
-                aug_onehot_labels.append(data.onehot_labels[i])
-                aug_onehot_labels_tuple.append(data.onehot_labels_tuple[i])
-                aug_num += 1
-
-    class _AugData:
-        def __init__(self):
-            pass
-
-        @property
-        def number(self):
-            return aug_num
-
-        @property
-        def patent_id(self):
-            return aug_patent_id
-
-        @property
-        def title_tokenindex(self):
-            return aug_title_tokenindex
-
-        @property
-        def abstract_tokenindex(self):
-            return aug_abstract_tokenindex
-
-        @property
-        def labels(self):
-            return aug_labels
-
-        @property
-        def onehot_labels(self):
-            return aug_onehot_labels
-
-        @property
-        def onehot_labels_tuple(self):
-            return aug_onehot_labels_tuple
-
-    return _AugData()
-
-
-def load_data_and_labels(data_file, num_classes_list, total_classes, word2vec_file, data_aug_flag):
-    """
-    Load research data from files, splits the data into words and generates labels.
-    Return split sentences, labels and the max sentence length of the research data.
-
-    Args:
-        data_file: The research data
-        num_classes_list: <list> The number of classes
-        total_classes: The total number of classes
-        word2vec_file: The word2vec file
-        data_aug_flag: The flag of data augmented
-    Returns:
-        The class _Data()
-    Raises:
-        IOError: If word2vec model file doesn't exist
-    """
-    # Load word2vec file
-    if not os.path.isfile(word2vec_file):
-        raise IOError("[Error] The word2vec file doesn't exist. ")
-
-    model = word2vec.Word2Vec.load(word2vec_file)
-
-    # Load data from files and split by words
-    data = data_word2vec(data_file, num_classes_list, total_classes, word2vec_model=model)
-    if data_aug_flag:
-        data = data_augmented(data)
-
-    # plot_seq_len(data_file, data)
-
-    return data
-
-
-def pad_data(data, pad_seq_len):
-    """
-    Padding each sentence of research data according to the max sentence length.
-    Return the padded data and data labels.
-
-    Args:
-        data: The research data
-        pad_seq_len: The max sentence length of research data
-    Returns:
-        pad_seq: The padded data
-        labels: The data labels
-    """
-    abstract_pad_seq = pad_sequences(data.abstract_tokenindex, maxlen=pad_seq_len, value=0.)
-    onehot_labels_list = data.onehot_labels
-    onehot_labels_list_tuple = data.onehot_labels_tuple
-    return abstract_pad_seq, onehot_labels_list, onehot_labels_list_tuple
+        Data['pad_seqs'] = pad_sequences(Data['content_index'], maxlen=args.pad_seq_len, value=0.)
+    return Data
 
 
 def batch_iter(data, batch_size, num_epochs, shuffle=True):

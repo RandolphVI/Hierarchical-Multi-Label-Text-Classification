@@ -22,6 +22,11 @@ OPTION = dh._option(pattern=0)
 logger = dh.logger_fn("tflog", "logs/{0}-{1}.log".format('Train' if OPTION == 'T' else 'Restore', time.asctime()))
 
 
+def create_input_data(data: dict):
+    return zip(data['pad_seqs'], data['section'], data['subsection'], data['group'],
+               data['subgroup'], data['onehot_labels'], data['labels'])
+
+
 def train_harnn():
     """Training HARNN model."""
     # Print parameters used for the model
@@ -30,14 +35,8 @@ def train_harnn():
     # Load sentences, labels, and training parameters
     logger.info("Loading data...")
     logger.info("Data processing...")
-    train_data = dh.load_data_and_labels(args.train_file, args.num_classes_list, args.total_classes,
-                                         args.word2vec_file, data_aug_flag=False)
-    val_data = dh.load_data_and_labels(args.validation_file, args.num_classes_list, args.total_classes,
-                                       args.word2vec_file, data_aug_flag=False)
-
-    logger.info("Data padding...")
-    x_train, y_train, y_train_tuple = dh.pad_data(train_data, args.pad_seq_len)
-    x_val, y_val, y_val_tuple = dh.pad_data(val_data, args.pad_seq_len)
+    train_data = dh.load_data_and_labels(args, args.train_file)
+    val_data = dh.load_data_and_labels(args, args.validation_file)
 
     # Build vocabulary
     VOCAB_SIZE, EMBEDDING_SIZE, pretrained_word2vec_matrix = dh.load_word2vec_matrix(args.word2vec_file)
@@ -124,20 +123,17 @@ def train_harnn():
 
             current_step = sess.run(harnn.global_step)
 
-            def train_step(x_batch, y_batch, y_batch_tuple):
+            def train_step(batch_data):
                 """A single training step"""
-                y_batch_first = [i[0] for i in y_batch_tuple]
-                y_batch_second = [j[1] for j in y_batch_tuple]
-                y_batch_third = [k[2] for k in y_batch_tuple]
-                y_batch_fourth = [t[3] for t in y_batch_tuple]
+                x, sec, subsec, group, subgroup, y_onehot, y = zip(*batch_data)
 
                 feed_dict = {
-                    harnn.input_x: x_batch,
-                    harnn.input_y_first: y_batch_first,
-                    harnn.input_y_second: y_batch_second,
-                    harnn.input_y_third: y_batch_third,
-                    harnn.input_y_fourth: y_batch_fourth,
-                    harnn.input_y: y_batch,
+                    harnn.input_x: x,
+                    harnn.input_y_first: sec,
+                    harnn.input_y_second: subsec,
+                    harnn.input_y_third: group,
+                    harnn.input_y_fourth: subgroup,
+                    harnn.input_y: y_onehot,
                     harnn.dropout_keep_prob: args.dropout_rate,
                     harnn.alpha: args.alpha,
                     harnn.is_training: True
@@ -147,10 +143,10 @@ def train_harnn():
                 logger.info("step {0}: loss {1:g}".format(step, loss))
                 train_summary_writer.add_summary(summaries, step)
 
-            def validation_step(x_val, y_val, y_val_tuple, writer=None):
+            def validation_step(val_loader, writer=None):
                 """Evaluates model on a validation set"""
                 batches_validation = dh.batch_iter(
-                    list(zip(x_val, y_val, y_val_tuple)), args.batch_size, 1)
+                    list(create_input_data(val_loader)), args.batch_size, 1)
 
                 # Predict classes by threshold or topk ('ts': threshold; 'tk': topk)
                 eval_counter, eval_loss = 0, 0.0
@@ -165,20 +161,15 @@ def train_harnn():
                 predicted_onehot_labels_tk = [[] for _ in range(args.topK)]
 
                 for batch_validation in batches_validation:
-                    x_batch_val, y_batch_val, y_batch_val_tuple = zip(*batch_validation)
-
-                    y_batch_val_first = [i[0] for i in y_batch_val_tuple]
-                    y_batch_val_second = [j[1] for j in y_batch_val_tuple]
-                    y_batch_val_third = [k[2] for k in y_batch_val_tuple]
-                    y_batch_val_fourth = [t[3] for t in y_batch_val_tuple]
+                    x, sec, subsec, group, subgroup, y_onehot, y = zip(*batch_validation)
 
                     feed_dict = {
-                        harnn.input_x: x_batch_val,
-                        harnn.input_y_first: y_batch_val_first,
-                        harnn.input_y_second: y_batch_val_second,
-                        harnn.input_y_third: y_batch_val_third,
-                        harnn.input_y_fourth: y_batch_val_fourth,
-                        harnn.input_y: y_batch_val,
+                        harnn.input_x: x,
+                        harnn.input_y_first: sec,
+                        harnn.input_y_second: subsec,
+                        harnn.input_y_third: group,
+                        harnn.input_y_fourth: subgroup,
+                        harnn.input_y: y_onehot,
                         harnn.dropout_keep_prob: 1.0,
                         harnn.alpha: args.alpha,
                         harnn.is_training: False
@@ -187,7 +178,7 @@ def train_harnn():
                         [harnn.global_step, validation_summary_op, harnn.scores, harnn.loss], feed_dict)
 
                     # Prepare for calculating metrics
-                    for onehot_labels in y_batch_val:
+                    for onehot_labels in y_onehot:
                         true_onehot_labels.append(onehot_labels)
                     for onehot_scores in scores:
                         predicted_onehot_scores.append(onehot_scores)
@@ -244,21 +235,20 @@ def train_harnn():
 
             # Generate batches
             batches_train = dh.batch_iter(
-                list(zip(x_train, y_train, y_train_tuple)), args.batch_size, args.epochs)
+                list(create_input_data(train_data)), args.batch_size, args.epochs)
 
-            num_batches_per_epoch = int((len(x_train) - 1) / args.batch_size) + 1
+            num_batches_per_epoch = int((len(train_data['pad_seqs']) - 1) / args.batch_size) + 1
 
             # Training loop. For each batch...
             for batch_train in batches_train:
-                x_batch_train, y_batch_train, y_batch_train_tuple = zip(*batch_train)
-                train_step(x_batch_train, y_batch_train, y_batch_train_tuple)
+                train_step(batch_train)
                 current_step = tf.train.global_step(sess, harnn.global_step)
 
                 if current_step % args.evaluate_steps == 0:
                     logger.info("\nEvaluation:")
                     eval_loss, eval_auc, eval_prc, \
                     eval_rec_ts, eval_pre_ts, eval_F1_ts, eval_rec_tk, eval_pre_tk, eval_F1_tk = \
-                        validation_step(x_val, y_val, y_val_tuple, writer=validation_summary_writer)
+                        validation_step(val_data, writer=validation_summary_writer)
 
                     logger.info("All Validation set: Loss {0:g} | AUC {1:g} | AUPRC {2:g}"
                                 .format(eval_loss, eval_auc, eval_prc))
