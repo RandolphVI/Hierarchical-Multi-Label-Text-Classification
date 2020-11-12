@@ -31,7 +31,7 @@ def parameter_parser():
 
     parser.add_argument("--word2vec-file",
                         nargs="?",
-                        default="../data/word2vec_100.model",
+                        default="../data/word2vec_100.kv",
                         help="Word2vec file for embedding characters (the dim need to be the same as embedding dim).")
 
     # Model Hyperparameters

@@ -27,14 +27,14 @@ def create_input_data(data: dict):
                data['subgroup'], data['onehot_labels'])
 
 
-def normalization(visual_list, visual_len):
+def normalization(visual_list, visual_len, epsilon=1e-12):
     min_weight = min(visual_list[:visual_len])
     max_weight = max(visual_list[:visual_len])
     margin = max_weight - min_weight
 
     result = []
     for i in range(visual_len):
-        value = (visual_list[i] - min_weight) / margin
+        value = (visual_list[i] - min_weight) / (margin + epsilon)
         result.append(value)
     return result
 
@@ -59,10 +59,13 @@ def create_visual_file(input_x, visual_list: list, seq_len):
 def visualize():
     """Visualize HARNN model."""
 
+    # Load word2vec model
+    word2idx, embedding_matrix = dh.load_word2vec_matrix(args.word2vec_file)
+
     # Load data
     logger.info("Loading data...")
     logger.info("Data processing...")
-    test_data = dh.load_data_and_labels(args, args.test_file)
+    test_data = dh.load_data_and_labels(args, args.test_file, word2idx)
 
     # Load harnn model
     OPTION = dh._option(pattern=1)
@@ -142,8 +145,6 @@ def visualize():
                     visual_list.append(normalization(visual[0].tolist(), length))
 
                 create_visual_file(x_content, visual_list, seq_len)
-
-
     logger.info("Done.")
 
 

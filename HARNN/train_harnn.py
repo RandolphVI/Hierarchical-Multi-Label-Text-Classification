@@ -32,14 +32,14 @@ def train_harnn():
     # Print parameters used for the model
     dh.tab_printer(args, logger)
 
+    # Load word2vec model
+    word2idx, embedding_matrix = dh.load_word2vec_matrix(args.word2vec_file)
+
     # Load sentences, labels, and training parameters
     logger.info("Loading data...")
     logger.info("Data processing...")
-    train_data = dh.load_data_and_labels(args, args.train_file)
-    val_data = dh.load_data_and_labels(args, args.validation_file)
-
-    # Build vocabulary
-    VOCAB_SIZE, EMBEDDING_SIZE, pretrained_word2vec_matrix = dh.load_word2vec_matrix(args.word2vec_file)
+    train_data = dh.load_data_and_labels(args, args.train_file, word2idx)
+    val_data = dh.load_data_and_labels(args, args.validation_file, word2idx)
 
     # Build a graph and harnn object
     with tf.Graph().as_default():
@@ -51,22 +51,24 @@ def train_harnn():
         with sess.as_default():
             harnn = TextHARNN(
                 sequence_length=args.pad_seq_len,
-                vocab_size=VOCAB_SIZE,
+                vocab_size=len(word2idx),
                 embedding_type=args.embedding_type,
-                embedding_size=EMBEDDING_SIZE,
+                embedding_size=args.embedding_dim,
                 lstm_hidden_size=args.lstm_dim,
                 attention_unit_size=args.attention_dim,
                 fc_hidden_size=args.fc_dim,
                 num_classes_list=args.num_classes_list,
                 total_classes=args.total_classes,
                 l2_reg_lambda=args.l2_lambda,
-                pretrained_embedding=pretrained_word2vec_matrix)
+                pretrained_embedding=embedding_matrix)
 
             # Define training procedure
             with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
                 learning_rate = tf.train.exponential_decay(learning_rate=args.learning_rate,
-                                                           global_step=harnn.global_step, decay_steps=args.decay_steps,
-                                                           decay_rate=args.decay_rate, staircase=True)
+                                                           global_step=harnn.global_step,
+                                                           decay_steps=args.decay_steps,
+                                                           decay_rate=args.decay_rate,
+                                                           staircase=True)
                 optimizer = tf.train.AdamOptimizer(learning_rate)
                 grads, vars = zip(*optimizer.compute_gradients(harnn.loss))
                 grads, _ = tf.clip_by_global_norm(grads, clip_norm=args.norm_ratio)
@@ -145,12 +147,10 @@ def train_harnn():
 
             def validation_step(val_loader, writer=None):
                 """Evaluates model on a validation set."""
-                batches_validation = dh.batch_iter(
-                    list(create_input_data(val_loader)), args.batch_size, 1)
+                batches_validation = dh.batch_iter(list(create_input_data(val_loader)), args.batch_size, 1)
 
                 # Predict classes by threshold or topk ('ts': threshold; 'tk': topk)
                 eval_counter, eval_loss = 0, 0.0
-
                 eval_pre_tk = [0.0] * args.topK
                 eval_rec_tk = [0.0] * args.topK
                 eval_F1_tk = [0.0] * args.topK
@@ -162,7 +162,6 @@ def train_harnn():
 
                 for batch_validation in batches_validation:
                     x, sec, subsec, group, subgroup, y_onehot = zip(*batch_validation)
-
                     feed_dict = {
                         harnn.input_x: x,
                         harnn.input_y_first: sec,
@@ -178,24 +177,22 @@ def train_harnn():
                         [harnn.global_step, validation_summary_op, harnn.scores, harnn.loss], feed_dict)
 
                     # Prepare for calculating metrics
-                    for onehot_labels in y_onehot:
-                        true_onehot_labels.append(onehot_labels)
-                    for onehot_scores in scores:
-                        predicted_onehot_scores.append(onehot_scores)
+                    for i in y_onehot:
+                        true_onehot_labels.append(i)
+                    for j in scores:
+                        predicted_onehot_scores.append(j)
 
                     # Predict by threshold
                     batch_predicted_onehot_labels_ts = \
                         dh.get_onehot_label_threshold(scores=scores, threshold=args.threshold)
-
-                    for onehot_labels in batch_predicted_onehot_labels_ts:
-                        predicted_onehot_labels_ts.append(onehot_labels)
+                    for k in batch_predicted_onehot_labels_ts:
+                        predicted_onehot_labels_ts.append(k)
 
                     # Predict by topK
                     for top_num in range(args.topK):
                         batch_predicted_onehot_labels_tk = dh.get_onehot_label_topk(scores=scores, top_num=top_num+1)
-
-                        for onehot_labels in batch_predicted_onehot_labels_tk:
-                            predicted_onehot_labels_tk[top_num].append(onehot_labels)
+                        for i in batch_predicted_onehot_labels_tk:
+                            predicted_onehot_labels_tk[top_num].append(i)
 
                     eval_loss = eval_loss + cur_loss
                     eval_counter = eval_counter + 1
@@ -212,12 +209,6 @@ def train_harnn():
                                            y_pred=np.array(predicted_onehot_labels_ts), average='micro')
                 eval_F1_ts = f1_score(y_true=np.array(true_onehot_labels),
                                       y_pred=np.array(predicted_onehot_labels_ts), average='micro')
-                # Calculate the average AUC
-                eval_auc = roc_auc_score(y_true=np.array(true_onehot_labels),
-                                         y_score=np.array(predicted_onehot_scores), average='micro')
-                # Calculate the average PR
-                eval_prc = average_precision_score(y_true=np.array(true_onehot_labels),
-                                                   y_score=np.array(predicted_onehot_scores), average='micro')
 
                 for top_num in range(args.topK):
                     eval_pre_tk[top_num] = precision_score(y_true=np.array(true_onehot_labels),
@@ -230,13 +221,18 @@ def train_harnn():
                                                    y_pred=np.array(predicted_onehot_labels_tk[top_num]),
                                                    average='micro')
 
-                return eval_loss, eval_auc, eval_prc, eval_rec_ts, eval_pre_ts, eval_F1_ts, \
-                       eval_rec_tk, eval_pre_tk, eval_F1_tk
+                # Calculate the average AUC
+                eval_auc = roc_auc_score(y_true=np.array(true_onehot_labels),
+                                         y_score=np.array(predicted_onehot_scores), average='micro')
+                # Calculate the average PR
+                eval_prc = average_precision_score(y_true=np.array(true_onehot_labels),
+                                                   y_score=np.array(predicted_onehot_scores), average='micro')
+
+                return eval_loss, eval_auc, eval_prc, eval_pre_ts, eval_rec_ts, eval_F1_ts, \
+                       eval_pre_tk, eval_rec_tk, eval_F1_tk
 
             # Generate batches
-            batches_train = dh.batch_iter(
-                list(create_input_data(train_data)), args.batch_size, args.epochs)
-
+            batches_train = dh.batch_iter(list(create_input_data(train_data)), args.batch_size, args.epochs)
             num_batches_per_epoch = int((len(train_data['pad_seqs']) - 1) / args.batch_size) + 1
 
             # Training loop. For each batch...
@@ -247,16 +243,13 @@ def train_harnn():
                 if current_step % args.evaluate_steps == 0:
                     logger.info("\nEvaluation:")
                     eval_loss, eval_auc, eval_prc, \
-                    eval_rec_ts, eval_pre_ts, eval_F1_ts, eval_rec_tk, eval_pre_tk, eval_F1_tk = \
+                    eval_pre_ts, eval_rec_ts, eval_F1_ts, eval_pre_tk, eval_rec_tk, eval_F1_tk = \
                         validation_step(val_data, writer=validation_summary_writer)
-
                     logger.info("All Validation set: Loss {0:g} | AUC {1:g} | AUPRC {2:g}"
                                 .format(eval_loss, eval_auc, eval_prc))
-
                     # Predict by threshold
                     logger.info("Predict by threshold: Precision {0:g}, Recall {1:g}, F1 {2:g}"
                                 .format(eval_pre_ts, eval_rec_ts, eval_F1_ts))
-
                     # Predict by topK
                     logger.info("Predict by topK:")
                     for top_num in range(args.topK):

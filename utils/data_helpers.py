@@ -7,11 +7,11 @@ import heapq
 import gensim
 import logging
 import json
-
+import numpy as np
 from collections import OrderedDict
 from pylab import *
 from texttable import Texttable
-from gensim.models import word2vec
+from gensim.models import KeyedVectors
 from tflearn.data_utils import pad_sequences
 
 
@@ -124,16 +124,16 @@ def get_model_name():
     return MODEL
 
 
-def create_prediction_file(output_file, data_id, all_labels, all_predict_labels, all_predict_scores):
+def create_prediction_file(output_file, data_id, true_labels, predict_labels, predict_scores):
     """
     Create the prediction file.
 
     Args:
         output_file: The all classes predicted results provided by network.
         data_id: The data record id info provided by dict <Data>.
-        all_labels: The all true labels.
-        all_predict_labels: The all predict labels by threshold.
-        all_predict_scores: The all predict scores by threshold.
+        true_labels: The all true labels.
+        predict_labels: The all predict labels by threshold.
+        predict_scores: The all predict scores by threshold.
     Raises:
         IOError: If the prediction file is not a .json file.
     """
@@ -141,16 +141,13 @@ def create_prediction_file(output_file, data_id, all_labels, all_predict_labels,
         raise IOError("[Error] The prediction file is not a json file."
                       "Please make sure the prediction data is a json file.")
     with open(output_file, 'w') as fout:
-        data_size = len(all_predict_labels)
+        data_size = len(predict_labels)
         for i in range(data_size):
-            predict_labels = [int(i) for i in all_predict_labels[i]]
-            predict_scores = [round(i, 4) for i in all_predict_scores[i]]
-            labels = [int(i) for i in all_labels[i]]
             data_record = OrderedDict([
                 ('id', data_id[i]),
-                ('labels', labels),
-                ('predict_labels', predict_labels),
-                ('predict_scores', predict_scores)
+                ('labels', [int(i) for i in true_labels[i]]),
+                ('predict_labels', [int(i) for i in predict_labels[i]]),
+                ('predict_scores', [round(i, 4) for i in predict_scores[i]])
             ])
             fout.write(json.dumps(data_record, ensure_ascii=False) + '\n')
 
@@ -207,6 +204,7 @@ def get_label_threshold(scores, threshold=0.5):
     """
     Get the predicted labels based on the threshold.
     If there is no predict score greater than threshold, then choose the label which has the max predict score.
+    Note: Only Used in `test_model.py`
 
     Args:
         scores: The all classes predicted scores provided by network.
@@ -238,6 +236,7 @@ def get_label_threshold(scores, threshold=0.5):
 def get_label_topk(scores, top_num=1):
     """
     Get the predicted labels based on the topK.
+    Note: Only Used in `test_model.py`
 
     Args:
         scores: The all classes predicted scores provided by network.
@@ -272,8 +271,8 @@ def create_metadata_file(word2vec_file, output_file):
     if not os.path.isfile(word2vec_file):
         raise IOError("[Error] The word2vec file doesn't exist.")
 
-    model = gensim.models.Word2Vec.load(word2vec_file)
-    word2idx = dict([(k, v.index) for k, v in model.wv.vocab.items()])
+    wv = KeyedVectors.load(word2vec_file, mmap='r')
+    word2idx = dict([(k, v.index) for k, v in wv.vocab.items()])
     word2idx_sorted = [(k, word2idx[k]) for k in sorted(word2idx, key=word2idx.get, reverse=False)]
 
     with open(output_file, 'w+') as fout:
@@ -287,59 +286,61 @@ def create_metadata_file(word2vec_file, output_file):
 
 def load_word2vec_matrix(word2vec_file):
     """
-    Get the word2vec model matrix.
+    Get the word2idx dict and embedding matrix.
 
     Args:
         word2vec_file: The word2vec file.
     Returns:
-        The word2vec model matrix.
+        word2idx: The word2idx dict.
+        embedding_matrix: The word2vec model matrix.
     Raises:
         IOError: If word2vec model file doesn't exist.
     """
     if not os.path.isfile(word2vec_file):
         raise IOError("[Error] The word2vec file doesn't exist. ")
 
-    model = gensim.models.Word2Vec.load(word2vec_file)
-    vocab_size = model.wv.vectors.shape[0]
-    embedding_size = model.vector_size
-    vocab = dict([(k, v.index) for k, v in model.wv.vocab.items()])
+    wv = KeyedVectors.load(word2vec_file, mmap='r')
+
+    word2idx = OrderedDict({"_UNK": 0})
+    embedding_size = wv.vector_size
+    for k, v in wv.vocab.items():
+        word2idx[k] = v.index + 1
+    vocab_size = len(word2idx)
+
     embedding_matrix = np.zeros([vocab_size, embedding_size])
-    for key, value in vocab.items():
-        if key is not None:
-            embedding_matrix[value] = model[key]
-    return vocab_size, embedding_size, embedding_matrix
+    for key, value in word2idx.items():
+        if key == "_UNK":
+            embedding_matrix[value] = [0. for _ in range(embedding_size)]
+        else:
+            embedding_matrix[value] = wv[key]
+    return word2idx, embedding_matrix
 
 
-def load_data_and_labels(args, input_file):
+def load_data_and_labels(args, input_file, word2idx: dict):
     """
     Load research data from files, padding sentences and generate one-hot labels.
 
     Args:
         args: The arguments.
         input_file: The research record.
+        word2idx: The word2idx dict.
     Returns:
         The dict <Data> (includes the record tokenindex and record labels)
     Raises:
         IOError: If word2vec model file doesn't exist
     """
-    # Load word2vec file
-    if not os.path.isfile(args.word2vec_file):
-        raise IOError("[Error] The word2vec file doesn't exist. ")
-
     if not input_file.endswith('.json'):
         raise IOError("[Error] The research record is not a json file. "
                       "Please preprocess the research record into the json file.")
 
-    word2vec_model = word2vec.Word2Vec.load(args.word2vec_file)
-    vocab = dict([(k, v.index) for (k, v) in word2vec_model.wv.vocab.items()])
-
-    def _token_to_index(x):
+    def _token_to_index(x: list):
         result = []
         for item in x:
-            word2id = vocab.get(item)
-            if word2id is None:
-                word2id = 0
-            result.append(word2id)
+            if item not in word2idx.keys():
+                result.append(word2idx['_UNK'])
+            else:
+                word_idx = word2idx[item]
+                result.append(word_idx)
         return result
 
     def _create_onehot_labels(labels_index, num_labels):

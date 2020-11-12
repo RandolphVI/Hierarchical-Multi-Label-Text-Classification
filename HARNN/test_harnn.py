@@ -35,10 +35,13 @@ def test_harnn():
     # Print parameters used for the model
     dh.tab_printer(args, logger)
 
-    # Load sentences, labels, and training parameters
+    # Load word2vec model
+    word2idx, embedding_matrix = dh.load_word2vec_matrix(args.word2vec_file)
+
+    # Load data
     logger.info("Loading data...")
     logger.info("Data processing...")
-    test_data = dh.load_data_and_labels(args, args.test_file)
+    test_data = dh.load_data_and_labels(args, args.test_file, word2idx)
 
     # Load harnn model
     OPTION = dh._option(pattern=1)
@@ -170,9 +173,8 @@ def test_harnn():
             if not os.path.exists(SAVE_DIR):
                 os.makedirs(SAVE_DIR)
             dh.create_prediction_file(output_file=SAVE_DIR + "/predictions.json", data_id=test_data['id'],
-                                      all_labels=true_labels, all_predict_labels=predicted_labels,
-                                      all_predict_scores=predicted_scores)
-
+                                      true_labels=true_labels, predict_labels=predicted_labels,
+                                      predict_scores=predicted_scores)
     logger.info("All Done.")
 
 
