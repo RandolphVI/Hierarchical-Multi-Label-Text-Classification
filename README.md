@@ -58,7 +58,7 @@ The project structure is below:
 
 ## Data
 
-You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p_vlYq31gE0Ly07Z2XTvD5QlM) used in the paper. And the [Word2vec model file](https://drive.google.com/open?id=1cu5sjts9x7eOcKw-ngXwFKpDMVItaivk) (dim=100) is also uploaded. **Make sure they are under the `/data` folder.**
+You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p_vlYq31gE0Ly07Z2XTvD5QlM) used in the paper. And the [Word2vec model file](https://drive.google.com/file/d/1tZ9WPXkoJmWwtcnOU8S_KGPMp8wnYohR/view?usp=sharing) (dim=100) is also uploaded. **Make sure they are under the `/data` folder.**
 
 (As for **Education Dataset**, they may attract copyright protection under China law. Thus, there is no details of dataset.)
 
