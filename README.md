@@ -91,39 +91,41 @@ Use the <u>figure in Introduction</u> as example, now I will explain how to cons
 **Step 1:** Figure has 3 categories, you should index this 3 categories first, like:
 
 ```
-{"Chemistry": 1, "Physics": 2, "Electricity": 3}
+{"Chemistry": 0, "Physics": 1, "Electricity": 2, "XXX": 3, ..., "XXX": N-1}
 ```
+
+Note: ***N*** is the total number of your categories.
 
 **Step 2**: You index the next level, like:
 
 ```
-{"Inorganic Chemistry": 1, "Organic Chemistry": 2, "Nuclear Physics": 3, "Material analysis": 4, "XXX": 5, ..., "XXX": N}
+{"Inorganic Chemistry": 0, "Organic Chemistry": 1, "Nuclear Physics": 2, "Material analysis": 3, "XXX": 4, ..., "XXX": M-1}
 ```
 
-Note: ***N*** is the total number of your subcategories.
+Note: ***M*** is the total number of your subcategories.
 
 **Step 3**: You index the third level, like:
 
 ```
-{"Steroids": 1, "Peptides": 2, "Heterocyclic Compounds": 3, ..., "XXX": M}
+{"Steroids": 0, "Peptides": 1, "Heterocyclic Compounds": 2, ..., "XXX": K-1}
 ```
 
-Note: ***M*** is the total number of your level-3 categories.
+Note: ***K*** is the total number of your level-3 categories.
 
 **Step 4**: If you have the fourth level or deeper level, index them.
 
 **Step 5**: Now Suppose you have one record:
 
 ```
-{"id": "1", "title": ["tokens"], "abstract": ["tokens"], "section": [1, 2], "subsection": [1, 2, 3, 4], "group": [1, 2, 3, 4], "labels": [1, 2, 1+N, 2+N, 3+N, 4+N, 1+N+M, 2+N+M, 3+N+M, 4+N+M]}
+{"id": "1", "title": ["tokens"], "abstract": ["tokens"], "section": [0, 1], "subsection": [0，1, 2, 3], "group": [0，1, 2, 3], "labels": [0, 1, 0+N, 1+N, 2+N, 3+N, 0+N+M, 1+N+M, 2+N+M, 3+N+M]}
 ```
 
-**Assume that your total category number of level-2 is 100 (*N*=100), of level-3 is 500 (*M*=500). *N* & *M* is the offset for the `labels` attribute.**
+**Assume that your total category number of level-1 is 10 (*N*=10), of level-2 is 100 (*M*=100). *N* & *M* is the offset for the `labels` attribute.**
 
 the record should be construed as:
 
 ```json
-{"id": "1", "hashtags": ["token"], "section": [1, 2], "subsection": [1, 2, 3, 4], "group": [1, 2, 3, 4], "labels": [1, 2, 101, 102, 103, 104, 601, 602, 603, 604]}
+{"id": "1", "hashtags": ["token"], "section": [0, 1], "subsection": [0, 1, 2, 3], "group": [0, 1, 2, 3], "labels": [0, 1, 10, 11, 12, 13, 110, 111, 112, 113]}
 ```
 
 This repository can be used in other datasets (text classification) in two ways:
