@@ -62,18 +62,22 @@ You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p
 
 (As for **Education Dataset**, they may attract copyright protection under China law. Thus, there is no details of dataset.)
 
-### Text Segment
+### :octocat: Text Segment
 
 1. You can use `nltk` package if you are going to deal with the English text data.
 
 2. You can use `jieba` package if you are going to deal with the Chinese text data.
 
-### Data Format
+### :octocat: Data Format
 
 See data format in `data` folder which including the data sample files. For example:
 
-```json
-{"id": "3930316", "title": ["sighting", "firearm"], "abstract": ["rear", "sight", "firearm", "ha", "peephole", "device", "formed", "hollow", "tube", "end", "closed", "peephole"], "section": [5], "subsection": [104], "group": [512], "subgroup": [6535], "labels": [5, 113, 649, 7333]}
+```
+{"id": "3930316", 
+"title": ["sighting", "firearm"], 
+"abstract": ["rear", "sight", "firearm", "ha", "peephole", "device", "formed", "hollow", "tube", "end", ...], 
+"section": [5], "subsection": [104], "group": [512], "subgroup": [6535], 
+"labels": [5, 113, 649, 7333]}
 ```
 
 - **"id"**: just the id.
@@ -84,48 +88,49 @@ See data format in `data` folder which including the data sample files. For exam
 - **"subgroup"**: it's the fourth level category index.
 - **"labels"**: it's the total category which add the index offset. (I will explain that later)
 
-### How to construct the data?
+### :octocat: How to construct the data?
 
-Use the <u>figure in Introduction</u> as example, now I will explain how to construct the label index. 
+Use the sample of the Patent Dataset as example, now I will explain how to construct the label index. 
+For patent dataset, the class number for each level is: [9, 128, 661, 8364].
 
-**Step 1:** Figure has 3 categories, you should index this 3 categories first, like:
-
-```
-{"Chemistry": 0, "Physics": 1, "Electricity": 2, "XXX": 3, ..., "XXX": N-1}
-```
-
-Note: ***N*** is the total number of your categories.
-
-**Step 2**: You index the next level, like:
+**Step 1:** For first level, Patent dataset has 9 classes, you should index this 9 classes first, like:
 
 ```
-{"Inorganic Chemistry": 0, "Organic Chemistry": 1, "Nuclear Physics": 2, "Material analysis": 3, "XXX": 4, ..., "XXX": M-1}
+{"Chemistry": 0, "Physics": 1, "Electricity": 2, "XXX": 3, ..., "XXX": 8}
 ```
 
-Note: ***M*** is the total number of your subcategories.
-
-**Step 3**: You index the third level, like:
+**Step 2**: Next, you index the next level (total **128** classes), like:
 
 ```
-{"Steroids": 0, "Peptides": 1, "Heterocyclic Compounds": 2, ..., "XXX": K-1}
+{"Inorganic Chemistry": 0, "Organic Chemistry": 1, "Nuclear Physics": 2, "XXX": 3, ..., "XXX": 127}
 ```
 
-Note: ***K*** is the total number of your level-3 categories.
+**Step 3**: Then, you index the third level (total **661** classes), like:
+
+```
+{"Steroids": 0, "Peptides": 1, "Heterocyclic Compounds": 2, ..., "XXX": 660}
+```
 
 **Step 4**: If you have the fourth level or deeper level, index them.
 
-**Step 5**: Now Suppose you have one record:
+**Step 5**: Now suppose you have one record (**id: 3930316** mentioned before):
 
 ```
-{"id": "1", "title": ["tokens"], "abstract": ["tokens"], "section": [0, 1], "subsection": [0，1, 2, 3], "group": [0，1, 2, 3], "labels": [0, 1, 0+N, 1+N, 2+N, 3+N, 0+N+M, 1+N+M, 2+N+M, 3+N+M]}
+{"id": "3930316", 
+"title": ["sighting", "firearm"], 
+"abstract": ["rear", "sight", "firearm", "ha", "peephole", "device", "formed", "hollow", "tube", "end", ...], 
+"section": [5], "subsection": [104], "group": [512], "subgroup": [6535],
+"labels": [5, 104+9, 512+9+128, 6535+9+128+661]}
 ```
 
-**Assume that your total category number of level-1 is 10 (*N*=10), of level-2 is 100 (*M*=100). *N* & *M* is the offset for the `labels` attribute.**
+thus, the record should be construed as:
 
-the record should be construed as:
-
-```json
-{"id": "1", "hashtags": ["token"], "section": [0, 1], "subsection": [0, 1, 2, 3], "group": [0, 1, 2, 3], "labels": [0, 1, 10, 11, 12, 13, 110, 111, 112, 113]}
+```
+{"id": "3930316", 
+"title": ["sighting", "firearm"], 
+"abstract": ["rear", "sight", "firearm", "ha", "peephole", "device", "formed", "hollow", "tube", "end", ...], 
+"section": [5], "subsection": [104], "group": [512], "subgroup": [6535], 
+"labels": [5, 113, 649, 7333]}
 ```
 
 This repository can be used in other datasets (text classification) in two ways:
@@ -134,12 +139,12 @@ This repository can be used in other datasets (text classification) in two ways:
 
 Anyway, it should depend on what your data and task are.
 
-### Pre-trained Word Vectors
+### :octocat: Pre-trained Word Vectors
 
 You can pre-training your word vectors(based on your corpus) in many ways:
 - Use `gensim` package to pre-train data.
 - Use `glove` tools to pre-train data.
-- Even can use a **fasttext** network to pre-train data.
+- Even can use **bert** to pre-train data.
 
 ## Usage
 
