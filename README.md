@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/language-python3.6-blue.svg)](https://www.python.org/downloads/) [![Build Status](https://travis-ci.org/RandolphVI/Hierarchical-Multi-Label-Text-Classification.svg?branch=master)](https://travis-ci.org/RandolphVI/Hierarchical-Multi-Label-Text-Classification)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/80fe0da5f16146219a5d0a66f8c8ed70)](https://www.codacy.com/manual/chinawolfman/Hierarchical-Multi-Label-Text-Classification?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=RandolphVI/Hierarchical-Multi-Label-Text-Classification&amp;utm_campaign=Badge_Grade)[![License](https://img.shields.io/github/license/RandolphVI/Hierarchical-Multi-Label-Text-Classification.svg)](https://www.apache.org/licenses/LICENSE-2.0) 
 
-This repository is my research project, and it is accepted by CIKM'19. The [paper](https://dl.acm.org/citation.cfm?id=3357384.3357885) is already published.
+This repository is my research project, which has been accepted by CIKM'19. The [paper](https://dl.acm.org/citation.cfm?id=3357384.3357885) is already published.
 
 The main objective of the project is to solve the hierarchical multi-label text classification (**HMTC**) problem. Different from the multi-label text classification, HMTC assigns each instance (object) into multiple categories and these categories are stored in a hierarchy structure, is a fundamental but challenging task of numerous applications.
 
@@ -60,7 +60,7 @@ The project structure is below:
 
 You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p_vlYq31gE0Ly07Z2XTvD5QlM) used in the paper. And the [Word2vec model file](https://drive.google.com/file/d/1tZ9WPXkoJmWwtcnOU8S_KGPMp8wnYohR/view?usp=sharing) (dim=100) is also uploaded. **Make sure they are under the `/data` folder.**
 
-(As for **Education Dataset**, they may attract copyright protection under China law. Thus, there is no details of dataset.)
+:warning: As for **Education Dataset**, they may be subject to copyright protection under Chinese law. Thus, detailed information is not provided.
 
 ### :octocat: Text Segment
 
@@ -70,7 +70,7 @@ You can download the [Patent Dataset](https://drive.google.com/open?id=1So3unr5p
 
 ### :octocat: Data Format
 
-See data format in `data` folder which including the data sample files. For example:
+See data format in `/data` folder which including the data sample files. For example:
 
 ```
 {"id": "3930316", 
@@ -80,20 +80,17 @@ See data format in `data` folder which including the data sample files. For exam
 "labels": [5, 113, 649, 7333]}
 ```
 
-- **"id"**: just the id.
-- **"title" & "abstract"**: it's the word segment (after cleaning stopwords).
-- **"section"**: it's the first level category index.
-- **"subsection"**: it's the second level category index.
-- **"group"**: it's the third level category index.
-- **"subgroup"**: it's the fourth level category index.
-- **"labels"**: it's the total category which add the index offset. (I will explain that later)
+- `id`: just the id.
+- `title` & `abstract`: it's the word segment (after cleaning stopwords).
+- `section` / `subsection` / `group` / `subgroup`: it's the first / second / third / fourth level category index.
+- `labels`: it's the total category which add the index offset. (I will explain that later)
 
 ### :octocat: How to construct the data?
 
-Use the sample of the Patent Dataset as example, now I will explain how to construct the label index. 
+Use the sample of the Patent Dataset as an example. I will explain how to construct the label index. 
 For patent dataset, the class number for each level is: [9, 128, 661, 8364].
 
-**Step 1:** For first level, Patent dataset has 9 classes, you should index this 9 classes first, like:
+**Step 1:** For the first level, Patent dataset has 9 classes. You should index these 9 classes first, like:
 
 ```
 {"Chemistry": 0, "Physics": 1, "Electricity": 2, "XXX": 3, ..., "XXX": 8}
@@ -123,7 +120,7 @@ For patent dataset, the class number for each level is: [9, 128, 661, 8364].
 "labels": [5, 104+9, 512+9+128, 6535+9+128+661]}
 ```
 
-thus, the record should be construed as:
+Thus, the record should be construed as follows:
 
 ```
 {"id": "3930316", 
@@ -144,7 +141,7 @@ Anyway, it should depend on what your data and task are.
 You can pre-training your word vectors(based on your corpus) in many ways:
 - Use `gensim` package to pre-train data.
 - Use `glove` tools to pre-train data.
-- Even can use **bert** to pre-train data.
+- Even can use `bert` to pre-train data.
 
 ## Usage
 
